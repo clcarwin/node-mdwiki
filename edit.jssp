@@ -100,6 +100,7 @@
       </div>
       <div class="footbar">
         <button  onclick="postfile()">Save</button>
+        <button  onclick="cancelfile()">Cancel</button>
         <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;">{{md_file_data}}</textarea>
       </div>
       <script type="text/javascript">
@@ -127,6 +128,12 @@
 
           request.open("POST", "postmd.jssp");
           request.send(formData);
+        }
+
+        function cancelfile()
+        {
+          var mdpath = $('#textdata').attr('data-path');
+          window.location.href = mdpath;
         }
       </script>
   </body>
