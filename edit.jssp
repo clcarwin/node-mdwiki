@@ -1,0 +1,136 @@
+<?
+    /*jssp code run on server*/
+    var fs = require('fs');
+    var filename = GET['p'];
+    if(!filename) filename = 'index';
+    var path = __dirname + '/wiki/' + filename + '.md';
+
+    fs.stat(path,function(err,stats)
+    {
+      if(err)
+      {
+            render('md_file_data','');
+            render('md_file_path',filename);
+      }
+      else
+      {
+        fs.readFile(path, function(err, data)
+        {
+          if(err)
+          {
+            render('md_file_data','');
+            render('md_file_path',filename);
+          }
+          else
+          {
+            render('md_file_data',data.toString('utf8'));
+            render('md_file_path',filename);
+          }
+        });
+      }
+    });
+?>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style type="text/css">
+      body {
+        background: #f8f8f8;
+        margin: 0px;
+      }
+      .headerbar {
+        top: 0px;
+        height: 45px;
+        background: #ffe;
+      }
+
+      .headermenu {
+        float: right;
+        margin: 20px 40px 10px 40px;
+      }
+      .main {
+          position: absolute;
+          width: 100%;
+          height: calc(100% - 90px);
+          top: 45px;
+      }
+      .contentarea {
+          background: #dde;
+          position: absolute;
+          width: 100%; 
+          height: calc(100% - 0px);
+          top: 0px;
+          float: left;
+          margin: 0;
+      }
+      .footbar {
+          position: absolute;
+          width: 100%;
+          height: 45px;
+          bottom: 0px;
+          background: #fef;
+      }
+      .footbar button {
+          width: 60px;
+          height: 25px;
+          margin: 10px;
+      }
+
+    </style>
+    <link rel="stylesheet" href="markdown-plus.min.css"/>
+    <script type="text/javascript" src="markdown-plus.min.js"></script>
+  </head>
+  <body>
+      <div class="headerbar">
+        <div class="headermenu"><a href="" onclick="postfile()">Save</a> <a href="">Admin</a> <a href="">Login</a></div>
+      </div>
+      <div class="main">     
+
+        <div class="contentarea">
+            <div class="ui-layout-center">
+              <div id="editor"></div> <!-- editor -->
+            </div>
+            <div class="ui-layout-east">
+              <article class="markdown-body" id="preview"></article>
+              <article class="markdown-body" id="cache" style="display: none"></article>
+            </div>
+        </div>
+      </div>
+      <div class="footbar">
+        <button  onclick="postfile()">Save</button>
+        <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;">{{md_file_data}}</textarea>
+      </div>
+      <script type="text/javascript">
+        var text      = document.getElementById("textdata").value;
+        $(function(){ editor.session.setValue(text); });
+
+        //console.log(mdc.render(editor.session.getValue()))
+        function postfile()
+        {
+          var mdtext = editor.session.getValue();
+          var mdhtml = mdc.render(mdtext);
+          var mdpath = $('#textdata').attr('data-path');
+          var formData = new FormData();
+          formData.append("mdtext",mdtext);
+          formData.append("mdhtml",mdhtml);
+          formData.append("mdpath",mdpath);
+
+          var request = new XMLHttpRequest();
+          request.onreadystatechange = function() {
+              if (request.readyState == XMLHttpRequest.DONE) {console.log(request.responseText);
+                  if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
+                  window.location.href = mdpath;
+              }
+          }
+
+          request.open("POST", "postmd.jssp");
+          request.send(formData);
+        }
+      </script>
+  </body>
+</html>
+
+
+

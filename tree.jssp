@@ -1,0 +1,25 @@
+<?
+	var fs = require('fs');
+	var rootdir = POST['dir'];
+	var files = fs.readdirSync(__dirname+'/wiki/'+rootdir);
+	var mdlist = [];
+	var dirlist = [];
+
+	files.forEach(function(name)
+	{
+		var path = __dirname+'/wiki/'+rootdir + '/' + name;
+		var stat = fs.statSync(path);
+		if(stat.isDirectory()&&(name.indexOf('.')<0)) dirlist.push(name);
+		if(stat.isFile()&&(name.slice(-3)=='.md')) mdlist.push(name.slice(0,name.length-3));
+	});
+
+	render('mdlist',mdlist);
+	render('dirlist',dirlist);
+	render('rootdir',rootdir);
+?>
+
+
+<ul class="jqueryFileTree" style="display: none;">
+    {{<li class="directory collapsed"><a href="#" rel="{{rootdir}}{{dirlist[i]}}/">{{dirlist[i]}}</a></li>}}
+    {{<li class="file ext_txt"><a href="#" rel="{{rootdir}}{{mdlist[i]}}">{{mdlist[i]}}</a></li>}}
+</ul>

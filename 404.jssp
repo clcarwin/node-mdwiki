@@ -1,0 +1,7 @@
+<?
+var filename = POST['filename'];
+if('index.jssp'==filename)
+{
+	POST['filename']=FILE['filename']='index';
+}
+include('show.jssp');

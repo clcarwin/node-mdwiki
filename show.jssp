@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<?
+    /*jssp code run on server*/
+    var fs = require('fs');
+    var filename = POST['filename'];
+    var path = __dirname + '/wiki/' + filename + '.md.html';
+
+    render('EditCreate','Edit');
+    fs.stat(path,function(err,stats)
+    {
+      if(err)
+      {
+        var html = "<h1>This topic does not exist yet</h1>" +
+            "<p>You've followed a link to a topic that doesn't exist yet." +
+            "You may create it by clicking on “Create”.</p>"
+        render('md_file_html',html);
+        render('md_file_path',filename);
+        render('EditCreate','Create');
+      }
+      else
+      {
+        fs.readFile(path, function(err, data)
+        {
+          if(err)
+          {
+            echo('<h1>'+err+'</h1>');
+            echo('<p>'+filename+'.md</p>');
+            exit();
+          }
+          else
+          {
+            render('md_file_html',data.toString('utf8'));
+            render('md_file_path',filename);
+          }
+        });
+      }
+    });
+?>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/markdown-plus.min.css"/>
+    <script type="text/javascript" src="/mermaid.min.js"></script>
+    <script type="text/javascript" src="/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" src="/jqueryFileTree.js"></script>
+    <link rel="stylesheet" href="/jqueryFileTree.css" />
+    <style type="text/css">
+      body {
+        background: #f8f8f8;
+        margin: 0px;
+      }
+      pre {
+          white-space: pre-wrap;       /* css-3 */
+          white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+          white-space: -pre-wrap;      /* Opera 4-6 */
+          white-space: -o-pre-wrap;    /* Opera 7 */
+          word-wrap: break-word;       /* Internet Explorer 5.5+ */
+          background-color: #f8f8f8;
+          border: 1px solid #dfdfdf;
+          margin-top: 1.5em;
+          margin-bottom: 1.5em;
+          padding: 0.125rem 0.3125rem 0.0625rem;
+      }
+
+      pre code {
+          background-color: transparent;
+          border: 0;
+          padding: 0;
+      }
+
+      .headerbar {
+        height: 45px;
+      }
+
+      .headermenu {
+        float: right;
+        margin: 20px 40px 10px 40px;
+      }
+      .main {
+          position: absolute;
+          width: 100%;
+          min-height: 600px;
+          top: 45px;
+      }
+      .contentarea {
+          background: #fff;
+          position: relative;
+          width: 100%; 
+          display: flex;
+          float: left;
+      }
+      #sider {
+          min-height: 500px;
+          background: #fff;
+          margin: 0px;
+          flex:1 0 150px;
+          padding: 10px;
+          border-right: 1px solid #aaa;
+      }
+      #show {
+          min-height: 500px;
+          max-width: 100000px;
+          flex:8 1 800px;
+          background: #fff;
+          margin: 10px;
+          padding: 20px;
+          overflow: auto;
+      }
+      .footarea {
+          width: 100%;
+          background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+      <div class="headerbar">
+        <div class="headermenu"><a href="/edit.jssp?p={{md_file_path}}">{{EditCreate}}</a> <a href="">Admin</a> <a href="">Login</a></div>
+      </div>
+      <div class="main">     
+
+        <div class="contentarea">
+            <div id="sider" class="sider"></div>
+            <div id="show" class="show markdown-body">{{md_file_html}}</div>
+            <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;"></textarea>
+        </div>
+        <div class="footarea">foot</div> 
+      </div>
+
+      <script type="text/javascript">
+        $(function () {
+            $('#sider').fileTree({
+                root: '/',
+                script: '/tree.jssp',
+                expandSpeed: 100,
+                collapseSpeed: 100,
+                multiFolder: true
+            },function(file) {
+                // alert(file);
+                window.location.href = ''+file;
+            });
+        });
+      </script>
+  </body>
+</html>

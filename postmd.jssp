@@ -1,0 +1,69 @@
+<?
+	var fs = require('fs');
+	var path = require('path');
+	var filename = POST['mdpath'];
+
+	var textfile = __dirname + '/wiki/' + filename + '.md';
+	var htmlfile = __dirname + '/wiki/' + filename + '.md.html';
+	var mddir    = __dirname + '/wiki/' + filename + '.md.dir';
+	var mdtext   = POST['mdtext'];
+	var mdhtml   = POST['mdhtml'];
+
+	function mkdir(path, root)
+	{
+	    var dirs = path.split('/'), dir = dirs.shift(), root = (root || '') + dir + '/';
+	    try
+	    {	var stat = undefined;
+	    	try{ stat = fs.statSync(root) }catch(e){}
+	    	if(!stat) fs.mkdirSync(root);
+	    }catch (e){}
+
+	    return !dirs.length || mkdir(dirs.join('/'), root);
+	}
+	function rm_dir(dirPath)
+	{
+		try{ var files = fs.readdirSync(dirPath) }catch(e){}
+		if(files) if(files.length > 0)
+		for (var i = 0; i < files.length; i++)
+		{
+			var filePath = dirPath + '/' + files[i];
+			if (fs.statSync(filePath).isFile())	fs.unlinkSync(filePath);
+			else rm_dir(filePath);
+		}
+		fs.rmdirSync(dirPath);
+    };
+
+	var dir = path.dirname(textfile);
+	mkdir(dir);
+	mkdir(mddir);
+
+	if(''!=mdtext)
+	{
+		fs.writeFile(textfile,mdtext);
+		fs.writeFile(htmlfile,mdhtml);
+	}
+	else
+	{
+		try{ fs.unlinkSync(textfile) }catch(e){}
+		try{ fs.unlinkSync(htmlfile) }catch(e){}
+		rm_dir(mddir);
+
+		var basedir = __dirname + '/wiki/';
+		basedir = path.normalize(basedir);
+
+		var workdir = mddir;
+		while(true)
+		{
+			workdir = workdir + '/../';
+			workdir = path.normalize(workdir);
+			if(workdir.length<=basedir.length) break;
+
+			var files = undefined;
+			try{ var files = fs.readdirSync(workdir) }catch(e){}
+			if(!files) break;
+			if(files.length) break;	//Directory not empty, we only delete empty directory.
+			rm_dir(workdir);
+		}
+	}
+	echo('ok');
+?>
