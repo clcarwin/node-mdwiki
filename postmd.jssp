@@ -5,7 +5,7 @@
 
 	var textfile = __dirname + '/wiki/' + filename + '.md';
 	var htmlfile = __dirname + '/wiki/' + filename + '.md.html';
-	var mddir    = __dirname + '/wiki/' + filename + '.md.dir';
+	var mddir    = __dirname + '/wiki/' + filename + '.md.list';
 	var mdtext   = POST['mdtext'];
 	var mdhtml   = POST['mdhtml'];
 

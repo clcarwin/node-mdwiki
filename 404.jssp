@@ -2,6 +2,7 @@
 var filename = POST['filename'];
 if('index.jssp'==filename)
 {
-	POST['filename']=FILE['filename']='index';
+	filename=POST['filename']=FILE['filename']='index';
 }
-include('show.jssp');
+if(filename.indexOf('.')>=0) include('download.jssp');
+else include('show.jssp');

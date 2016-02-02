@@ -1,0 +1,36 @@
+<?
+	var fs = require('fs');
+	var path = require('path');
+
+	var mdpath = POST['filename'];
+	var filefullpath = __dirname + '/wiki/' + mdpath;
+	var filedir  = path.dirname(filefullpath);
+	var filename = path.basename(filefullpath);
+	var filemdpath = filedir+'.md';
+	var filerealpath = filedir+'.md.list/'+filename;
+
+	fs.stat(filerealpath,function(err,stats)
+	{
+		if(err)
+		{
+			echo('<h1>404 Not Found</h1>');
+			echo('<p>'+SERVER['HTTP_HOST']+'/'+filename+'</p>');
+			exit();
+		}
+		else
+		{
+			fs.readFile(filerealpath,function(err,data)
+			{
+				if(err)
+				{
+					echo('<h1>'+err+'</h1>');
+		            echo('<p>'+filename+'.md</p>');
+		            exit();
+				}
+				else
+				{
+					echo(data);
+				}
+			});
+		}
+	});

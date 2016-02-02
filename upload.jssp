@@ -1,0 +1,17 @@
+<?
+	var fs = require('fs');
+
+	var mdpath = POST['mdpath'];
+	var filename = undefined;
+	for(filename in FILE) {}
+	var buffer = FILE[filename];
+
+	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
+	var filepath = mddir + '/' + filename;
+	fs.writeFileSync(filepath,buffer);
+
+	var files = fs.readdirSync(mddir);
+	render('files',files);
+	render('mdpath',mdpath);
+?>
+{{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
