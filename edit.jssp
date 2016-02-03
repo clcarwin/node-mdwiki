@@ -126,6 +126,12 @@
           white-space: nowrap;
           max-width: 315px;
           text-decoration: none;
+          vertical-align: middle;
+          cursor: pointer;
+      }
+      .singlefile .insert {
+          font-weight: normal;
+          margin-left: 15px;
       }
       .singlefile div {
           background: url('/button_delete.png') no-repeat 0 0;
@@ -169,6 +175,7 @@
       <div class="filelist">
         <!-- <div class="singlefile"><a href="" >test.txt</a><div></div></div> -->
         {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
+          <a class="insert" onclick="ii(this,'{{mdpath}}','{{files[i]}}')">insert</a>
           <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}
       </div>
       <script type="text/javascript">
@@ -244,6 +251,13 @@
           }
         }
 
+        function ii(obj,mdpath,filename)
+        {
+          var ext = filename.slice(-4);
+          var pre = "";
+          if( (ext==".png")||(ext==".jpg")||(ext==".bmp")||(ext==".gif")||(ext=="jpeg") ) pre="!"
+          editor.insert("\n"+pre+"["+filename+"](/"+mdpath+"/"+filename+")\n");
+        }
         function pp(obj,mdpath,filename)
         {
           var formData = new FormData();
