@@ -3,9 +3,8 @@
     var fs = require('fs');
     var querystring = require('querystring');
 
-    var filename = GET['p'];
-    if(!filename) filename = 'index';
-    var mdpath = filename;
+    var filename = POST['filename'];
+    var mdpath   = POST['filename'];
     var path = __dirname + '/wiki/' + filename + '.md';
 
     var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
@@ -89,7 +88,7 @@
           background: #fef;
       }
       .footbar button {
-          width: 60px;
+          width: 80px;
           height: 25px;
           margin: 10px;
       }
@@ -108,6 +107,11 @@
           border: 1px solid #dcdcdc;
           float: left;
       }
+      .singlefile:last-child 
+      {
+          margin-bottom: 40px;
+      }
+
       .singlefile a {
           color: #15c;
           font-weight: bold;
@@ -136,8 +140,8 @@
       }
 
     </style>
-    <link rel="stylesheet" href="markdown-plus.min.css"/>
-    <script type="text/javascript" src="markdown-plus.min.js"></script>
+    <link rel="stylesheet" href="/markdown-plus.min.css"/>
+    <script type="text/javascript" src="/markdown-plus.min.js"></script>
   </head>
   <body>
       <div class="headerbar">
@@ -186,18 +190,18 @@
           request.onreadystatechange = function() {
               if (request.readyState == XMLHttpRequest.DONE) {
                   if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
-                  window.location.href = mdpath;
+                  window.location.href = '/'+mdpath;
               }
           }
 
-          request.open("POST", "postmd.jssp");
+          request.open("POST", "/postmd.jssp");
           request.send(formData);
         }
 
         function cancelfile()
         {
           var mdpath = $('#textdata').attr('data-path');
-          window.location.href = mdpath;
+          window.location.href = '/'+mdpath;
         }
 
 
@@ -212,21 +216,32 @@
 
         function handleFiles(files)
         {
-          //alert(files[0].size);
           var mdpath = $('#textdata').attr('data-path');
           var formData = new FormData();
           formData.append("upload",files[0],files[0].name);
           formData.append("mdpath",mdpath);
           var request = new XMLHttpRequest();
+          request.upload.addEventListener("progress", postprogress);
           request.onreadystatechange = function() {
               if (request.readyState == XMLHttpRequest.DONE) {
                 var html = request.responseText;
                 $('.filelist').html(html);
+                fileElem.value = '';  //clear file input
+                $('#fileSelect').html('Upload');
               }
           }
 
-          request.open("POST", "upload.jssp");
+          request.open("POST", "/upload.jssp");
           request.send(formData);
+        }
+        function postprogress(event)
+        {
+          if (event.lengthComputable)
+          {
+            var percentComplete = event.loaded / event.total;
+            console.log(percentComplete);
+            $('#fileSelect').html(' ' + Math.floor(percentComplete*100)+'%');
+          }
         }
 
         function pp(obj,mdpath,filename)
@@ -243,7 +258,7 @@
               }
           }
 
-          request.open("POST", "delete.jssp");
+          request.open("POST", "/delete.jssp");
           request.send(formData);
         }
       </script>
