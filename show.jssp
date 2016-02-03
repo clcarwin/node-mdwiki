@@ -3,7 +3,36 @@
     /*jssp code run on server*/
     var fs = require('fs');
     var filename = POST['filename'];
-    var path = __dirname + '/wiki/' + filename + '.md.html';
+    var mdpath   = POST['filename'];
+    var path  = __dirname + '/wiki/' + filename + '.md.html';
+    
+    var mddir = __dirname + '/wiki/' + mdpath + '.md.list';
+    fs.readdir(mddir,function(err,files)
+    {
+      if(err) files=[];
+
+      var statlist = [];
+      for(var i=0;i<files.length;i++)
+      {
+        var stat = fs.statSync(mddir+'/'+files[i]);
+        stat.name = files[i];
+        stat.time = stat.mtime.getTime();
+        statlist.push(stat);
+      }
+      for(var i=0;i<statlist.length-1;i++)
+        for(var j=i+1;j<statlist.length;j++)
+        {
+          if(statlist[i].time > statlist[j].time)
+          {
+            var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
+          }
+        }
+
+      files = [];
+      for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
+      render('files',files);
+      render('mdpath',mdpath);
+    });
 
     render('EditCreate','Edit');
     fs.stat(path,function(err,stats)
@@ -111,6 +140,50 @@
           width: 100%;
           background: #fff;
       }
+
+      .filelistmain {
+          width: 100%;
+          display: flex;
+          float: left;
+      }
+      .filelistspace {
+          flex:1 0 150px;
+          padding: 10px;
+          border-right: 1px solid #aaa;
+          background: #fff;
+      }
+      .filelistreal {
+          max-width: 100000px;
+          flex:8 1 800px;
+          margin: 10px;
+          padding: 20px;
+      }
+
+      .singlefile {
+          width: calc(50% - 30px);
+          height: 21px;
+          background: #ede;
+          margin: 1px 0px 1px 10px;
+          padding: 0px 0px 0px 15px;
+          background-color: #f5f5f5;
+          border: 1px solid #dcdcdc;
+          float: left;
+      }
+      .singlefile a {
+          color: #15c;
+          font-weight: bold;
+          font-size: 13px;
+          font-family: arial,sans-serif;
+
+          display: inline-block;
+          overflow: hidden;
+          padding: 3px 0;
+          text-overflow: ellipsis;
+          vertical-align: bottom;
+          white-space: nowrap;
+          max-width: 315px;
+          text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -124,7 +197,14 @@
             <div id="show" class="show markdown-body">{{md_file_html}}</div>
             <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;"></textarea>
         </div>
-        <div class="footarea">foot</div> 
+        <div class="footarea">
+          <div class="filelistmain">
+            <div class="filelistspace"></div>
+            <div class="filelistreal">
+              {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
+            </div>
+          </div>
+        </div> 
       </div>
 
       <script type="text/javascript">

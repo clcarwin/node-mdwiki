@@ -1,37 +1,47 @@
 <?
     /*jssp code run on server*/
     var fs = require('fs');
+    var querystring = require('querystring');
+
     var filename = GET['p'];
     if(!filename) filename = 'index';
     var mdpath = filename;
     var path = __dirname + '/wiki/' + filename + '.md';
 
     var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
-    var files = fs.readdirSync(mddir);
+    var files = [];
+    try{ files=fs.readdirSync(mddir) }catch(e){}
+    var statlist = [];
+    for(var i=0;i<files.length;i++)
+    {
+      var stat = fs.statSync(mddir+'/'+files[i]);
+      stat.name = files[i];
+      stat.time = stat.mtime.getTime();
+      statlist.push(stat);
+    }
+    for(var i=0;i<statlist.length-1;i++)
+      for(var j=i+1;j<statlist.length;j++)
+      {
+        if(statlist[i].time > statlist[j].time)
+        {
+          var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
+        }
+      }
+
+    files = [];
+    for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
     render('files',files);
     render('mdpath',mdpath);
 
     fs.stat(path,function(err,stats)
     {
-      if(err)
-      {
-            render('md_file_data','');
-            render('md_file_path',filename);
-      }
+      if(err){ render('md_file_data','') }
       else
       {
         fs.readFile(path, function(err, data)
         {
-          if(err)
-          {
-            render('md_file_data','');
-            render('md_file_path',filename);
-          }
-          else
-          {
-            render('md_file_data',data.toString('utf8'));
-            render('md_file_path',filename);
-          }
+          if(err) render('md_file_data','');
+          else    render('md_file_data',data.toString('utf8'));
         });
       }
     });
@@ -90,6 +100,7 @@
       }
       .singlefile {
           width: calc(50% - 30px);
+          height: 21px;
           background: #ede;
           margin: 1px 0px 1px 10px;
           padding: 0px 0px 0px 15px;
@@ -113,7 +124,7 @@
           text-decoration: none;
       }
       .singlefile div {
-          background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAAAYUlEQVQ4y2P4//8/A7Uxw6ihw8BQIDAAYn40MX6QOFmGQg38AMQnYAZDDTwBFTcgx1CYAf+htBwan59c7yMb/JMYA4mKKKgLfyIZLEdpRFHXpTQJU5rEPk3S6WjeHwGGAgB7bY/MvPH1YwAAAABJRU5ErkJggg==') no-repeat 0 0;
+          background: url('/button_delete.png') no-repeat 0 0;
           cursor: pointer;
           float: right;
           height: 16px;
@@ -149,11 +160,12 @@
         <button  onclick="cancelfile()">Cancel</button>
         <input type="file" id="fileElem" style="display:none" onchange="handleFiles(this.files)">
         <button id="fileSelect">Upload</button>
-        <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;">{{md_file_data}}</textarea>
+        <textarea id="textdata" data-path="{{mdpath}}" style="display: none;">{{md_file_data}}</textarea>
       </div>
       <div class="filelist">
         <!-- <div class="singlefile"><a href="" >test.txt</a><div></div></div> -->
-        {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
+        {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
+          <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}
       </div>
       <script type="text/javascript">
         var text      = document.getElementById("textdata").value;
@@ -209,12 +221,29 @@
           request.onreadystatechange = function() {
               if (request.readyState == XMLHttpRequest.DONE) {
                 var html = request.responseText;
-                console.log(html);
                 $('.filelist').html(html);
               }
           }
 
           request.open("POST", "upload.jssp");
+          request.send(formData);
+        }
+
+        function pp(obj,mdpath,filename)
+        {
+          var formData = new FormData();
+          formData.append("filename",filename);
+          formData.append("mdpath",mdpath);
+
+          var request = new XMLHttpRequest();
+          request.onreadystatechange = function() {
+              if (request.readyState == XMLHttpRequest.DONE) {
+                var html = request.responseText;
+                $('.filelist').html(html);
+              }
+          }
+
+          request.open("POST", "delete.jssp");
           request.send(formData);
         }
       </script>

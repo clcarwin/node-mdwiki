@@ -1,8 +1,9 @@
 <?
-var filename = POST['filename'];
-if('index.jssp'==filename)
-{
-	filename=POST['filename']=FILE['filename']='index';
-}
-if(filename.indexOf('.')>=0) include('download.jssp');
-else include('show.jssp');
+	var querystring = require('querystring');
+
+	POST['filename'] = querystring.unescape(POST['filename']);
+	var filename = POST['filename'];
+	if('index.jssp'==filename) filename=POST['filename']='index';
+
+	if(filename.indexOf('.')>=0) include('download.jssp');
+	else include('show.jssp');
