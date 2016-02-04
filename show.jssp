@@ -5,35 +5,9 @@
     var filename = POST['filename'];
     var mdpath   = POST['filename'];
     var path  = __dirname + '/wiki/' + filename + '.md.html';
-    
     var mddir = __dirname + '/wiki/' + mdpath + '.md.list';
-    fs.readdir(mddir,function(err,files)
-    {
-      if(err) files=[];
 
-      var statlist = [];
-      for(var i=0;i<files.length;i++)
-      {
-        var stat = fs.statSync(mddir+'/'+files[i]);
-        stat.name = files[i];
-        stat.time = stat.mtime.getTime();
-        statlist.push(stat);
-      }
-      for(var i=0;i<statlist.length-1;i++)
-        for(var j=i+1;j<statlist.length;j++)
-        {
-          if(statlist[i].time > statlist[j].time)
-          {
-            var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
-          }
-        }
-
-      files = [];
-      for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
-      render('files',files);
-      render('mdpath',mdpath);
-    });
-
+    render('mdpath',mdpath);
     render('EditCreate','Edit');
     fs.stat(path,function(err,stats)
     {
@@ -45,6 +19,8 @@
         render('md_file_html',html);
         render('md_file_path',filename);
         render('EditCreate','Create');
+
+        render('files',[]);
       }
       else
       {
@@ -62,6 +38,32 @@
             render('md_file_path',filename);
           }
         });
+
+        fs.readdir(mddir,function(err,files)
+        {
+          if(err) files=[];
+
+          var statlist = [];
+          for(var i=0;i<files.length;i++)
+          {
+            var stat = fs.statSync(mddir+'/'+files[i]);
+            stat.name = files[i];
+            stat.time = stat.mtime.getTime();
+            statlist.push(stat);
+          }
+          for(var i=0;i<statlist.length-1;i++)
+            for(var j=i+1;j<statlist.length;j++)
+            {
+              if(statlist[i].time > statlist[j].time)
+              {
+                var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
+              }
+            }
+
+          files = [];
+          for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
+          render('files',files);
+        }); //fs.readdir(mddir,function(err,files)
       }
     });
 ?>
@@ -145,6 +147,7 @@
           width: 100%;
           display: flex;
           float: left;
+          background: #fff;
       }
       .filelistspace {
           flex:1 0 150px;

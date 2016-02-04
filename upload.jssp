@@ -6,8 +6,33 @@
 	for(filename in FILE) {}
 	var buffer = FILE[filename];
 
+	function mkdir(path, root)
+	{
+	    var dirs = path.split('/'), dir = dirs.shift(), root = (root || '') + dir + '/';
+	    try
+	    {	var stat = undefined;
+	    	try{ stat = fs.statSync(root) }catch(e){}
+	    	if(!stat) fs.mkdirSync(root);
+	    }catch (e){}
+
+	    return !dirs.length || mkdir(dirs.join('/'), root);
+	}
+	function rm_dir(dirPath)
+	{
+		try{ var files = fs.readdirSync(dirPath) }catch(e){}
+		if(files) if(files.length > 0)
+		for (var i = 0; i < files.length; i++)
+		{
+			var filePath = dirPath + '/' + files[i];
+			if (fs.statSync(filePath).isFile())	fs.unlinkSync(filePath);
+			else rm_dir(filePath);
+		}
+		try{ fs.rmdirSync(dirPath) }catch(e){}
+    };
+
 	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
 	var filepath = mddir + '/' + filename;
+	mkdir(mddir);	//the dir may not exist
 	fs.writeFileSync(filepath,buffer);
 
 	var files = [];

@@ -5,12 +5,41 @@
 	var mdlist = [];
 	var dirlist = [];
 
+	function rm_dir(dirPath)
+	{
+		try{ var files = fs.readdirSync(dirPath) }catch(e){}
+		if(files) if(files.length > 0)
+		for (var i = 0; i < files.length; i++)
+		{
+			var filePath = dirPath + '/' + files[i];
+			if (fs.statSync(filePath).isFile())	fs.unlinkSync(filePath);
+			else rm_dir(filePath);
+		}
+		try{ fs.rmdirSync(dirPath) }catch(e){}
+    };
+
 	files.forEach(function(name)
 	{
 		var path = __dirname+'/wiki/'+rootdir + '/' + name;
 		var stat = fs.statSync(path);
 		if(stat.isDirectory()&&(name.indexOf('.')<0)) dirlist.push(name);
-		if(stat.isFile()&&(name.slice(-3)=='.md')) mdlist.push(name.slice(0,name.length-3));
+		if(stat.isFile()&&(name.slice(-3)=='.md'))
+		{
+			if(name!='index.md') mdlist.push(name.slice(0,name.length-3));
+		}
+
+		if(stat.isDirectory()&&(name.slice(-5)=='.list'))
+		{
+			//remove xxxx.md.list dir, if xxxx.md file not exists
+			var mdname = name.slice(0,name.length-5);
+			if(files.indexOf(mdname)<0) rm_dir(path); 
+		}
+		if(stat.isFile()&&(name.slice(-5)=='.html'))
+		{
+			//remove xxxx.md.html file, if xxxx.md file not exists
+			var mdname = name.slice(0,name.length-5);
+			if(files.indexOf(mdname)<0) fs.unlinkSync(path); 
+		}
 	});
 
 	render('mdlist',mdlist);
