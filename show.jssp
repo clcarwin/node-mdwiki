@@ -94,10 +94,12 @@
           padding: 0.125rem 0.3125rem 0.0625rem;
       }
 
-      pre code {
+      .markdown-body pre code {
           background-color: transparent;
           border: 0;
           padding: 0;
+          white-space: pre-wrap;
+          word-wrap: break-word;
       }
 
       .headerbar {
