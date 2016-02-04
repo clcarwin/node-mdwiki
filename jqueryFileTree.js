@@ -33,7 +33,7 @@
 if(jQuery) (function($){
 	
 	$.extend($.fn, {
-		fileTree: function(o, h) {
+		fileTree: function(o, h, loadfinish) {
 			// Defaults
 			if( !o ) var o = {};
 			if( o.root == undefined ) o.root = '/';
@@ -56,6 +56,8 @@ if(jQuery) (function($){
 						$(c).removeClass('wait').append(data);
 						if( o.root == t ) $(c).find('UL:hidden').show(); else $(c).find('UL:hidden').slideDown({ duration: o.expandSpeed, easing: o.expandEasing });
 						bindTree(c);
+
+						if(loadfinish) loadfinish(t,c);
 					});
 				}
 				

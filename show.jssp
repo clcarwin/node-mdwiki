@@ -211,6 +211,9 @@
       </div>
 
       <script type="text/javascript">
+        var mdpath = $('#textdata').attr('data-path');
+        var mdpathlong = '/' + mdpath;
+
         $(function () {
             $('#sider').fileTree({
                 root: '/',
@@ -221,6 +224,13 @@
             },function(file) {
                 // alert(file);
                 window.location.href = ''+file;
+            },function(dir,parent)
+            {
+              parent.find('.jqueryFileTree .directory a').each(function()
+              {
+                var rel = $(this).attr('rel');
+                if(mdpathlong.indexOf(rel)>=0) $(this).triggerHandler('click','fastexpanded');
+              });
             });
         });
       </script>
