@@ -94,7 +94,7 @@
           padding: 0.125rem 0.3125rem 0.0625rem;
       }
 
-      .markdown-body pre code {
+      .main .markdown-body pre code {
           background-color: transparent;
           border: 0;
           padding: 0;
