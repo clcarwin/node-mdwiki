@@ -191,7 +191,7 @@
   </head>
   <body>
       <div class="headerbar">
-        <div class="headermenu"><a href="/{{md_file_path}}?p=edit">{{EditCreate}}</a> <a href="">Admin</a> <a href="">Login</a></div>
+        <div class="headermenu"><a href="/{{md_file_path}}?p=edit">{{EditCreate}}</a></div>
       </div>
       <div class="main">     
 

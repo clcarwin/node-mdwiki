@@ -151,7 +151,7 @@
   </head>
   <body>
       <div class="headerbar">
-        <div class="headermenu"><a href="" onclick="postfile()">Save</a> <a href="">Admin</a> <a href="">Login</a></div>
+        <div class="headermenu"><a href="javascript:function(){return false;}" onclick="postfile()">Save</a></div>
       </div>
       <div class="main">     
 
