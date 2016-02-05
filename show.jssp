@@ -101,6 +101,10 @@
           word-wrap: break-word;
       }
 
+      .mermaid {
+          opacity: 0;
+      }
+
       .headerbar {
         height: 45px;
       }
@@ -216,7 +220,12 @@
         var mdpathlong = '/' + mdpath;
 
         $(function () {
-            $.getScript( "/mermaid.min.js");
+            if( $('.mermaid').size()>0 ) {
+              $.getScript( "/mermaid.min.js",function(){
+                mermaid.init();
+                $('.mermaid').fadeTo(1000,1);
+              });
+            }
 
             $('#sider').fileTree({
                 root: '/',
