@@ -322,8 +322,6 @@
         {
           var img = document.createElement('img');
           img.src= dataurl;
-          var w = img.naturalWidth;
-          var h = img.naturalHeight;
           img = $(img);
           img.addClass('pasteimagepreview');
           img.css('position','absolute');
@@ -334,6 +332,8 @@
 
           setTimeout(function()
           {
+            var w = img.get(0).naturalWidth;
+            var h = img.get(0).naturalHeight;
             var imagename = prompt("Please enter the image's name! "+w+"x"+h, "");
             img.remove();
             if(!imagename) return;
