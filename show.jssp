@@ -72,7 +72,6 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="/markdown-plus.min.css"/>
-    <script type="text/javascript" src="/mermaid.min.js"></script>
     <script type="text/javascript" src="/jquery-1.12.0.min.js"></script>
     <script type="text/javascript" src="/jqueryFileTree.js"></script>
     <link rel="stylesheet" href="/jqueryFileTree.css" />
@@ -217,6 +216,8 @@
         var mdpathlong = '/' + mdpath;
 
         $(function () {
+            $.getScript( "/mermaid.min.js");
+
             $('#sider').fileTree({
                 root: '/',
                 script: '/tree.jssp',

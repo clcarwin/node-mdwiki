@@ -268,7 +268,7 @@
           if (event.lengthComputable)
           {
             var percentComplete = event.loaded / event.total;
-            console.log(percentComplete);
+            //console.log(percentComplete);
             $('#fileSelect').html(' ' + Math.floor(percentComplete*100)+'%');
           }
         }
@@ -297,9 +297,56 @@
           request.open("POST", "/delete.jssp");
           request.send(formData);
         }
+
+        document.onpaste = function (event) {
+          // use event.originalEvent.clipboard for newer chrome versions
+          var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+          var blob = null;
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+              blob = items[i].getAsFile();
+            }
+          }
+          if(!blob) return;
+
+          // load image if there is a pasted image
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            var dataurl = event.target.result;
+            //console.log(event.target.result); // data url!
+            uploadpasteimage(dataurl,blob);
+          };
+          reader.readAsDataURL(blob);
+        }
+        function uploadpasteimage(dataurl,blob)
+        {
+          var img = document.createElement('img');
+          img.src= dataurl;
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          img = $(img);
+          img.addClass('pasteimagepreview');
+          img.css('position','absolute');
+          img.css('z-index','100');
+          img.css('width','50%');
+          img.css('background','#fff');
+          $('body').prepend(img);
+
+          setTimeout(function()
+          {
+            var imagename = prompt("Please enter the image's name! "+w+"x"+h, "");
+            img.remove();
+            if(!imagename) return;
+            if(imagename.indexOf('.')<0) imagename = imagename + '.png';
+            blob.name = imagename;
+            handleFiles([blob]);
+          },0);
+        }
       </script>
   </body>
 </html>
+
+
 
 
 
