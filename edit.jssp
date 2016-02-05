@@ -342,6 +342,15 @@
             handleFiles([blob]);
           },0);
         }
+
+        $('body').on('drop',function (event) {
+          event.preventDefault();
+        });
+        $('body').on('drop',function (event) {
+          var files = event.originalEvent.dataTransfer.files;
+          var result = confirm("Do you really want to upload the file '"+files[0].name+"'?");
+          if(result) handleFiles(files);
+        });
       </script>
   </body>
 </html>
