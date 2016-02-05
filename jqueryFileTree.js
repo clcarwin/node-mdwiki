@@ -49,7 +49,7 @@ if(jQuery) (function($){
 			$(this).each( function() {
 				
 				function showTree(c, t) {
-					$(c).addClass('wait');
+					//$(c).addClass('wait');
 					$(".jqueryFileTree.start").remove();
 					$.post(o.script, { dir: t }, function(data) {
 						$(c).find('.start').html('');
