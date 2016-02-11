@@ -1,0 +1,4 @@
+<?
+	POST['mdpath'] = 'index';
+	if(GET['p']=='edit') include('edit.jssp');
+	else include('show.jssp');

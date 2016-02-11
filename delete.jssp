@@ -34,6 +34,6 @@
 	render('files',files);
 	render('mdpath',mdpath);
 ?>
-{{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
+{{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
   <a class="insert" onclick="ii(this,'{{mdpath}}','{{files[i]}}')">insert</a>
   <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}

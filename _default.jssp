@@ -1,0 +1,21 @@
+<?
+	var querystring = require('querystring');
+	var path = require('path');
+	var fs   = require('fs');
+	var url  = require('url');
+
+	POST['REQUEST'] = querystring.unescape(POST['REQUEST']);
+	var urlobj = url.parse(POST['REQUEST']);
+	var filename = urlobj.pathname;
+
+	if(filename.indexOf('.')>=0)
+	{
+		POST['filename'] = filename;
+		include('download.jssp');
+	}
+	else
+	{
+		POST['mdpath'] = filename;
+		if(GET['p']=='edit') include('edit.jssp');
+		else include('show.jssp');
+	}

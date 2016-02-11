@@ -3,8 +3,8 @@
     var fs = require('fs');
     var querystring = require('querystring');
 
-    var filename = POST['filename'];
-    var mdpath   = POST['filename'];
+    var filename = POST['mdpath'];
+    var mdpath   = POST['mdpath'];
     var path = __dirname + '/wiki/' + filename + '.md';
 
     var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
@@ -156,7 +156,7 @@
           margin-left: 15px;
       }
       .singlefile div {
-          background: url('/button_delete.png') no-repeat 0 0;
+          background: url('/static/button_delete.png') no-repeat 0 0;
           cursor: pointer;
           float: right;
           height: 16px;
@@ -168,8 +168,8 @@
       }
 
     </style>
-    <link rel="stylesheet" href="/markdown-plus.min.css"/>
-    <script type="text/javascript" src="/markdown-plus.min.js"></script>
+    <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
+    <script type="text/javascript" src="/static/markdown-plus.min.js"></script>
   </head>
   <body>
       <div class="headerbar">
@@ -196,7 +196,7 @@
       </div>
       <div class="filelist">
         <!-- <div class="singlefile"><a href="" >test.txt</a><div></div></div> -->
-        {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
+        {{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
           <a class="insert" onclick="ii(this,'{{mdpath}}','{{files[i]}}')">insert</a>
           <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}
       </div>
@@ -219,7 +219,7 @@
           request.onreadystatechange = function() {
               if (request.readyState == XMLHttpRequest.DONE) {
                   if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
-                  window.location.href = '/'+mdpath;
+                  window.location.href = mdpath;
               }
           }
 
@@ -230,7 +230,7 @@
         function cancelfile()
         {
           var mdpath = $('#textdata').attr('data-path');
-          window.location.href = '/'+mdpath;
+          window.location.href = mdpath;
         }
 
 
@@ -278,7 +278,7 @@
           var ext = filename.slice(-4);
           var pre = "";
           if( (ext==".png")||(ext==".jpg")||(ext==".bmp")||(ext==".gif")||(ext=="jpeg") ) pre="!"
-          editor.insert("\n"+pre+"["+filename+"](/"+mdpath+"/"+filename+")\n");
+          editor.insert("\n"+pre+"["+filename+"]("+mdpath+"/"+filename+")\n");
         }
         function pp(obj,mdpath,filename)
         {

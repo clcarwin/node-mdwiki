@@ -1,0 +1,83 @@
+<?
+	var spawn = require('child_process').spawn;
+	var path = require('path');
+
+	var mdpath = POST['mdpath'];
+	var search = POST['search'];
+	search = 'http';
+	if(search.trim().length<3)
+	{
+		echo('<p>The search string too short!</p>');
+		exit();
+		return;
+	}
+
+	//grep -r --include \*.md -C 3 "TD" .
+	var args = ["-r", "--include", "*.md", "-C", "1", search, __dirname + "/wiki"];
+	var grep = spawn('grep',args);
+
+	var str = "";
+	grep.stdout.on('data',function(data)
+	{
+		str = data.toString();
+		greptohtml(str);
+		//echo(str);
+	});
+
+	function greptohtml(str)
+	{
+		var l = str.split('\n--\n');
+
+		var list = [];
+		for(var i=0;i<l.length;i++) if(l[i].length>0) list.push(l[i]);
+
+		var pathlist = [];
+		var bodylist = [];
+		for(var i=0;i<list.length;i++)
+		{
+			var body = list[i];
+			var index = body.indexOf('.md-');
+			var mdpath = body.slice(0,index+4-1);
+			body = body.replace(new RegExp(mdpath+'-', 'g'), "");
+			body = body.replace(new RegExp(mdpath+':', 'g'), "");
+			body = body.replace(new RegExp('<', 'g'), "&lt;");
+			// body = body.replace(new RegExp(search, 'g'),
+			// 	   '<span style="background-color: #ffff99;">'+search+'</span>');
+			// body = body.replace(new RegExp('\n', 'g'), '<br>\n');
+
+			mdpath = mdpath.replace(new RegExp(__dirname, 'g'), "");
+			// var filename = path.basename(mdpath);
+			// body = '<a class="searchhead" href="'+mdpath+'?h='+search+'">'+filename+'</a>\n'+
+			//        '<div class="searchbody">'+body+'</div>';
+			
+			pathlist.push(mdpath);
+			bodylist.push(body);
+			echo(body);
+		}
+
+		if(0==pathlist.length) return;
+		var fullpathlist = [];
+		var fullbodylist = [];
+
+		var tempp = pathlist[0];
+		var tempb = [ bodylist[0] ];
+		for(var i=1;i<pathlist.length;i++)
+		{
+			if(tempp == pathlist[i]) tempb.push(bodylist[i]);
+			else
+			{
+				fullpathlist.push(tempp);
+				fullbodylist.push(tempb);
+				tempp = pathlist[i];
+				tempb = [ bodylist[i] ];
+			}
+		}
+		fullpathlist.push(tempp);
+		fullbodylist.push(tempb);
+
+		//to be continue
+	}
+
+
+
+

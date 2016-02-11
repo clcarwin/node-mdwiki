@@ -2,8 +2,8 @@
 <?
     /*jssp code run on server*/
     var fs = require('fs');
-    var filename = POST['filename'];
-    var mdpath   = POST['filename'];
+    var filename = POST['mdpath'];
+    var mdpath   = POST['mdpath'];
     var path  = __dirname + '/wiki/' + filename + '.md.html';
     var mddir = __dirname + '/wiki/' + mdpath + '.md.list';
 
@@ -71,10 +71,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="/markdown-plus.min.css"/>
-    <script type="text/javascript" src="/jquery-1.12.0.min.js"></script>
-    <script type="text/javascript" src="/jqueryFileTree.js"></script>
-    <link rel="stylesheet" href="/jqueryFileTree.css" />
+    <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
+    <script type="text/javascript" src="/static/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" src="/static/jqueryFileTree.js"></script>
+    <link rel="stylesheet" href="/static/jqueryFileTree.css" />
     <style type="text/css">
       body {
         background: #f8f8f8;
@@ -196,7 +196,7 @@
   </head>
   <body>
       <div class="headerbar">
-        <div class="headermenu"><a href="/{{md_file_path}}?p=edit">{{EditCreate}}</a></div>
+        <div class="headermenu"><a href="{{md_file_path}}?p=edit">{{EditCreate}}</a></div>
       </div>
       <div class="main">     
 
@@ -209,7 +209,7 @@
           <div class="filelistmain">
             <div class="filelistspace"></div>
             <div class="filelistreal">
-              {{<div class="singlefile"><a href="/{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
+              {{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
             </div>
           </div>
         </div> 
@@ -217,11 +217,11 @@
 
       <script type="text/javascript">
         var mdpath = $('#textdata').attr('data-path');
-        var mdpathlong = '/' + mdpath;
+        var mdpathlong = mdpath;
 
         $(function () {
             if( $('.mermaid').size()>0 ) {
-              $.getScript( "/mermaid.min.js",function(){
+              $.getScript( "/static/mermaid.min.js",function(){
                 mermaid.init();
                 $('.mermaid').fadeTo(1000,1);
               });
