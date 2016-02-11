@@ -3,12 +3,16 @@
 	var path = require('path');
 
 	var mdpath = POST['mdpath'];
-	mdpath = '/ai/deep_learning';
 	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
 
 	fs.readdir(mddir,function(err,files)
 	{
-		if(err) return exit();
+		if(err)
+		{
+			render('sl',[]);
+			render('mdpath',mdpath);
+			return;
+		}
 
 		var statlist = [];
 		for(var i=0;i<files.length;i++)
