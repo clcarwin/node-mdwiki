@@ -20,7 +20,7 @@
         render('md_file_path',filename);
         render('EditCreate','Create');
 
-        render('files',[]);
+        render('statlist',[]);
       }
       else
       {
@@ -38,32 +38,6 @@
             render('md_file_path',filename);
           }
         });
-
-        fs.readdir(mddir,function(err,files)
-        {
-          if(err) files=[];
-
-          var statlist = [];
-          for(var i=0;i<files.length;i++)
-          {
-            var stat = fs.statSync(mddir+'/'+files[i]);
-            stat.name = files[i];
-            stat.time = stat.mtime.getTime();
-            statlist.push(stat);
-          }
-          for(var i=0;i<statlist.length-1;i++)
-            for(var j=i+1;j<statlist.length;j++)
-            {
-              if(statlist[i].time > statlist[j].time)
-              {
-                var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
-              }
-            }
-
-          files = [];
-          for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
-          render('files',files);
-        }); //fs.readdir(mddir,function(err,files)
       }
     });
 ?>
@@ -160,7 +134,7 @@
           border-right: 1px solid #aaa;
           background: #fff;
       }
-      .filelistreal {
+      .filelist {
           max-width: 100000px;
           flex:8 1 800px;
           margin: 10px;
@@ -192,6 +166,21 @@
           max-width: 315px;
           text-decoration: none;
       }
+      .singlefile .sizelabel {
+          color: #777;
+          font-weight: bold;
+          font-size: 13px;
+          font-family: arial,sans-serif;
+          display: inline-block;
+          padding: 3px 0;
+      }
+      .singlefile .insert {
+          display: none;
+      }
+      .singlefile .closefile {
+          display: none;
+      }
+
       .searchtext {
           background-color: #ffff99;
       }
@@ -214,8 +203,8 @@
         <div class="footarea">
           <div class="filelistmain">
             <div class="filelistspace"></div>
-            <div class="filelistreal">
-              {{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a><div></div></div>}}
+            <div class="filelist">
+              <? include('attachmentlist.jssp'); ?>
             </div>
           </div>
         </div> 

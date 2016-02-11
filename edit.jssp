@@ -3,44 +3,20 @@
     var fs = require('fs');
     var querystring = require('querystring');
 
-    var filename = POST['mdpath'];
     var mdpath   = POST['mdpath'];
-    var path = __dirname + '/wiki/' + filename + '.md';
+    var path = __dirname + '/wiki/' + mdpath + '.md';
 
-    var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
-    var files = [];
-    try{ files=fs.readdirSync(mddir) }catch(e){}
-    var statlist = [];
-    for(var i=0;i<files.length;i++)
-    {
-      var stat = fs.statSync(mddir+'/'+files[i]);
-      stat.name = files[i];
-      stat.time = stat.mtime.getTime();
-      statlist.push(stat);
-    }
-    for(var i=0;i<statlist.length-1;i++)
-      for(var j=i+1;j<statlist.length;j++)
-      {
-        if(statlist[i].time > statlist[j].time)
-        {
-          var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
-        }
-      }
-
-    files = [];
-    for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
-    render('files',files);
     render('mdpath',mdpath);
 
     fs.stat(path,function(err,stats)
     {
-      if(err){ render('md_file_data','') }
+      if(err){ render('mddata','') }
       else
       {
         fs.readFile(path, function(err, data)
         {
-          if(err) render('md_file_data','');
-          else    render('md_file_data',data.toString('utf8'));
+          if(err) render('mddata','');
+          else    render('mddata',data.toString('utf8'));
         });
       }
     });
@@ -155,7 +131,7 @@
           font-weight: normal;
           margin-left: 15px;
       }
-      .singlefile div {
+      .singlefile .closefile {
           background: url('/static/button_delete.png') no-repeat 0 0;
           cursor: pointer;
           float: right;
@@ -165,6 +141,17 @@
           width: 16px;
           right: 10px;
           position: relative;
+      }
+      .singlefile .sizelabel {
+          color: #777;
+          font-weight: bold;
+          font-size: 13px;
+          font-family: arial,sans-serif;
+          display: inline-block;
+          padding: 3px 0;
+      }
+      .singlefile .notimage {
+          display: none;
       }
 
     </style>
@@ -194,17 +181,18 @@
         <button  onclick="cancelfile()">Cancel</button>
         <input type="file" id="fileElem" style="display:none" onchange="handleFiles(this.files)">
         <button id="fileSelect">Upload</button>
-        <textarea id="textdata" data-path="{{mdpath}}" style="display: none;">{{md_file_data}}</textarea>
+        <textarea id="textdata" data-path="{{mdpath}}" style="display: none;">{{mddata}}</textarea>
       </div>
       <div class="filelist">
         <!-- <div class="singlefile"><a href="" >test.txt</a><div></div></div> -->
-        {{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
-          <a class="insert" onclick="ii(this,'{{mdpath}}','{{files[i]}}')">insert</a>
-          <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}
       </div>
       <script type="text/javascript">
         var text      = document.getElementById("textdata").value;
         $(function(){ editor.session.setValue(text); });
+
+        $(function(){ //load attachmentlist
+          $.post( "/attachmentlist.jssp", function(data){ $( ".filelist" ).html(data) });
+        });
 
         //console.log(mdc.render(editor.session.getValue()))
         function postfile()
@@ -245,7 +233,7 @@
           e.preventDefault(); // prevent navigation to "#"
         }, false);
 
-        function handleFiles(files)
+        function handleFiles(files,method)
         {
           var mdpath = $('#textdata').attr('data-path');
           var formData = new FormData();
@@ -259,6 +247,9 @@
                 $('.filelist').html(html);
                 fileElem.value = '';  //clear file input
                 $('#fileSelect').html('Upload');
+
+                //auto insert when paste and drop
+                if((method=='paste')||(method=='drop')) ii(undefined,mdpath,files[0].name);
               }
           }
 
@@ -270,7 +261,6 @@
           if (event.lengthComputable)
           {
             var percentComplete = event.loaded / event.total;
-            //console.log(percentComplete);
             $('#fileSelect').html(' ' + Math.floor(percentComplete*100)+'%');
           }
         }
@@ -278,9 +268,16 @@
         function ii(obj,mdpath,filename)
         {
           var ext = filename.slice(-4);
+          ext = ext.toLowerCase();
           var pre = "";
-          if( (ext==".png")||(ext==".jpg")||(ext==".bmp")||(ext==".gif")||(ext=="jpeg") ) pre="!"
+
+          if(['.png','.jpg','.bmp','.gif','jpeg'].indexOf(ext)>=0) pre="!";
           editor.insert("\n"+pre+"["+filename+"]("+mdpath+"/"+filename+")\n");
+        }
+        function ii2(obj,mdpath,filename)
+        {
+          var html = '\n<img src="'+mdpath+'/'+filename+'" width="500">\n';
+          editor.insert(html);
         }
         function pp(obj,mdpath,filename)
         {
@@ -341,7 +338,7 @@
             if(!imagename) return;
             if(imagename.indexOf('.')<0) imagename = imagename + '.png';
             blob.name = imagename;
-            handleFiles([blob]);
+            handleFiles([blob],'paste');
           },0);
         }
 
@@ -351,7 +348,7 @@
         $('body').on('drop',function (event) {
           var files = event.originalEvent.dataTransfer.files;
           var result = confirm("Do you really want to upload the file '"+files[0].name+"'?");
-          if(result) handleFiles(files);
+          if(result) handleFiles(files,'drop');
         });
       </script>
   </body>

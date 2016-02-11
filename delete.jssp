@@ -9,31 +9,4 @@
 	var filepath = mddir + '/' + filename;
 	fs.unlinkSync(filepath);
 
-	var files = [];
-	files = fs.readdirSync(mddir);
-
-	var statlist = [];
-	for(var i=0;i<files.length;i++)
-	{
-		var stat = fs.statSync(mddir+'/'+files[i]);
-		stat.name = files[i];
-		stat.time = stat.mtime.getTime();
-		statlist.push(stat);
-	}
-	for(var i=0;i<statlist.length-1;i++)
-		for(var j=i+1;j<statlist.length;j++)
-		{
-			if(statlist[i].time > statlist[j].time)
-			{
-				var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
-			}
-		}
-
-	files = [];
-	for(var i=0;i<statlist.length;i++) files.push(statlist[i].name);
-	render('files',files);
-	render('mdpath',mdpath);
-?>
-{{<div class="singlefile"><a href="{{mdpath}}/{{files[i]}}" >{{files[i]}}</a>
-  <a class="insert" onclick="ii(this,'{{mdpath}}','{{files[i]}}')">insert</a>
-  <div onclick="pp(this,'{{mdpath}}','{{files[i]}}')"></div></div>}}
+	include('attachmentlist.jssp');

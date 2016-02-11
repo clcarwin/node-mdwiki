@@ -1,0 +1,51 @@
+<?
+	var fs = require('fs');
+	var path = require('path');
+
+	var mdpath = POST['mdpath'];
+	mdpath = '/ai/deep_learning';
+	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
+
+	fs.readdir(mddir,function(err,files)
+	{
+		if(err) return exit();
+
+		var statlist = [];
+		for(var i=0;i<files.length;i++)
+		{
+			var stat = fs.statSync(mddir+'/'+files[i]);
+			stat.name = files[i];
+			stat.time = stat.mtime.getTime();
+			statlist.push(stat);
+		}
+		for(var i=0;i<statlist.length-1;i++)
+			for(var j=i+1;j<statlist.length;j++)
+			{
+				if(statlist[i].time > statlist[j].time)
+				{
+					var s=statlist[i]; statlist[i]=statlist[j]; statlist[j]=s;
+				}
+			}
+		for(var i=0;i<statlist.length;i++)
+		{
+			var size = statlist[i].size;
+			if(size<1024) size = size + 'B';
+			else size = Math.floor(size/1024) + 'K';
+
+			statlist[i].sizelabel = size;
+
+			var ext = path.extname(statlist[i].name);
+			ext = ext.toLowerCase();
+			if(['.png','.jpg','.bmp','.gif','.jpeg'].indexOf(ext)<0) statlist[i].img = 'notimage';
+			else statlist[i].img = '';
+		}
+		render('sl',statlist);
+		render('mdpath',mdpath);
+	});
+?>
+{{<div class="singlefile"><a href="{{mdpath}}/{{sl[i].name}}" >{{sl[i].name}}</a>
+  <div class="sizelabel">({{sl[i].sizelabel}})</div>
+  <a class="insert" onclick="ii(this,'{{mdpath}}','{{sl[i].name}}')">insert</a>
+  <a class="insert {{sl[i].img}}" onclick="ii2(this,'{{mdpath}}','{{sl[i].name}}')">img</a>
+  <div class="closefile" onclick="pp(this,'{{mdpath}}','{{sl[i].name}}')"></div>
+</div>}}
