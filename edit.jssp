@@ -173,7 +173,9 @@
   </head>
   <body>
       <div class="headerbar">
-        <div class="headermenu"><a href="javascript:function(){return false;}" onclick="postfile()">Save</a></div>
+        <div class="headermenu">
+          <a href="javascript:var a=function(){return false;}" onclick="postfile()">Save</a>
+        </div>
       </div>
       <div class="main">     
 

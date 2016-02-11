@@ -192,11 +192,17 @@
           max-width: 315px;
           text-decoration: none;
       }
+      .searchtext {
+          background-color: #ffff99;
+      }
     </style>
   </head>
   <body>
       <div class="headerbar">
-        <div class="headermenu"><a href="{{md_file_path}}?p=edit">{{EditCreate}}</a></div>
+        <div class="headermenu">
+          <a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>
+          <a href="{{md_file_path}}?p=edit">{{EditCreate}}</a>
+        </div>
       </div>
       <div class="main">     
 
@@ -245,6 +251,29 @@
               });
             });
         });
+
+        function search_text()
+        {
+          var searchtext = prompt("Please enter the search text!", "");
+          if(!searchtext) return;
+          searchtext = searchtext.trim();
+          if(searchtext.length<3){ alert("The search text too short!"); return; }
+
+          var formData = new FormData();
+          formData.append("search",searchtext);
+          formData.append("mdpath",mdpath);
+
+          var request = new XMLHttpRequest();
+          request.onreadystatechange = function() {
+              if (request.readyState == XMLHttpRequest.DONE) {
+                var html = request.responseText;
+                $('#show').html(html);
+              }
+          }
+
+          request.open("POST", "/search.jssp");
+          request.send(formData);
+        }
       </script>
   </body>
 </html>
