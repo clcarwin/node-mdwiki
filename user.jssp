@@ -1,0 +1,99 @@
+<?
+	var fs = require('fs');
+	session_start();
+
+	//op="add"&name="carwin"&password="eeffeefefefefeefeaa"&mode="loginedit"
+	//op = add delete login loginout list getmode setmode
+	var op = GET['op'];
+	var name = GET['name'];
+	var password = GET['password'];
+	var mode = GET['mode'];
+
+	var config = '';
+	try{ config = fs.readFileSync(__dirname + '/wikiconfig', 'utf8') }catch(e){}
+	var configobj = {};
+	try{ configobj = JSON.parse(config) }catch(e){}
+	if(!configobj.wikimode)
+	{
+		configobj.wikimode = 'loginedit';	//everyone loginedit loginview
+		configobj.user = {};
+		configobj.user['root'] = '';
+
+		config = JSON.stringify(configobj);
+		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+	}
+	SESSION.wikimode = configobj.wikimode;
+	
+
+	if('login'==op)
+	{
+		var truepassword = configobj.user[name];
+		if(truepassword=='')
+		{
+			SESSION.username = name;
+			SESSION.wikimode = configobj.wikimode;
+			echo('needsetpassword');
+		}
+		else
+		if(truepassword==password)
+		{
+			SESSION.username = name;
+			SESSION.wikimode = configobj.wikimode;
+			echo('ok');
+		}
+		else echo('loginerror');
+
+		return;
+	}
+
+	if(!SESSION.username) echo('nologin');
+	else
+	if('logout'==op)
+	{
+		delete SESSION.username;
+		echo('ok');
+	}
+	else
+	if('add'==op)
+	{
+		configobj.user[name] = password;
+		config = JSON.stringify(configobj);
+		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+		echo('ok');
+	}
+	else
+	if('delete'==op)
+	{
+		delete configobj.user[name];
+		if(name==SESSION.username) delete SESSION.username;
+
+		config = JSON.stringify(configobj);
+		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+		echo('ok');
+	}
+	else
+	if('list'==op)
+	{
+		var list = '';
+		for(var key in configobj.user) list += key+', ';
+		list = list.slice(0,list.length-2);
+		echo(list);
+	}
+	else
+	if('setmode'==op)
+	{
+		if(["everyone","loginedit","loginview"].indexOf(mode)<0) echo('modeerror');
+
+		configobj.wikimode = mode;
+		SESSION.wikimode = configobj.wikimode;
+
+		config = JSON.stringify(configobj);
+		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+		echo('ok');
+	}
+	else
+	if('getmode'==op) echo(configobj.wikimode);
+
+
+
+

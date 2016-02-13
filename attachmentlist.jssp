@@ -1,18 +1,20 @@
 <?
+	session_start();
+
 	var fs = require('fs');
 	var path = require('path');
 
 	var mdpath = POST['mdpath'];
 	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
 
+	render('sl',[]);
+	render('mdpath',mdpath);
+
+	if(!SESSION.viewable) return;
+
 	fs.readdir(mddir,function(err,files)
 	{
-		if(err)
-		{
-			render('sl',[]);
-			render('mdpath',mdpath);
-			return;
-		}
+		if(err) return;
 
 		var statlist = [];
 		for(var i=0;i<files.length;i++)

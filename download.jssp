@@ -1,4 +1,6 @@
 <?
+	session_start();
+
 	var fs = require('fs');
 	var path = require('path');
 
@@ -22,6 +24,8 @@
 	}
 	else
 	{
+		if(!SESSION.viewable) return;
+		
 		var filefullpath = __dirname + '/wiki/' + mdpath;
 		var filedir  = path.dirname(filefullpath);
 		var filename = path.basename(filefullpath);

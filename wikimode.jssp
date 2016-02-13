@@ -1,0 +1,23 @@
+<?
+	var fs = require('fs');
+	session_start();
+
+	var configobj = {};
+	fs.readFile(__dirname + '/wikiconfig', 'utf8',function(err, data)
+	{
+		if(err) configobj.wikimode = 'loginedit';
+		else
+		{
+			try{ configobj = JSON.parse(config) }catch(e){}
+		}
+
+		if(!configobj.wikimode) configobj.wikimode = 'loginedit';
+		SESSION.wikimode = configobj.wikimode;
+
+		if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
+	    else SESSION.viewable = true;
+
+	    if((SESSION.wikimode=='loginedit')&&(!SESSION.username)) SESSION.editable = false;
+	    else if((SESSION.wikimode=='loginview')&&(!SESSION.username)) SESSION.editable = false;
+	    else SESSION.editable = true;
+	});

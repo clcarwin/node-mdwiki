@@ -1,4 +1,7 @@
 <?
+	session_start();
+	if(!SESSION.editable) return;
+	
 	var fs = require('fs');
 
 	var mdpath = POST['mdpath'];

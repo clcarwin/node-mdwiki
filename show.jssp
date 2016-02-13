@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <?
+    session_start();
+    if(!SESSION.wikimode) include('wikimode.jssp');
+    render('username',SESSION.username ? SESSION.username:'');
+?>
+<?
     /*jssp code run on server*/
     var fs = require('fs');
-    var filename = POST['mdpath'];
     var mdpath   = POST['mdpath'];
-    var path  = __dirname + '/wiki/' + filename + '.md.html';
+    var path  = __dirname + '/wiki/' + mdpath + '.md.html';
     var mddir = __dirname + '/wiki/' + mdpath + '.md.list';
 
     render('mdpath',mdpath);
-    render('EditCreate','Edit');
+    render('mdexist',true);
     fs.stat(path,function(err,stats)
     {
       if(err)
       {
         var html = "<h1>This topic does not exist yet</h1>" +
-            "<p>You've followed a link to a topic that doesn't exist yet." +
-            "You may create it by clicking on “Create”.</p>"
-        render('md_file_html',html);
-        render('md_file_path',filename);
-        render('EditCreate','Create');
+            "<p>You've followed a link to a topic that doesn't exist yet. " +
+            "You may create it by clicking on “Create”.</p>";
+        render('mdhtml',html);
+        render('mdexist',false);
 
         render('statlist',[]);
       }
@@ -29,24 +32,51 @@
           if(err)
           {
             echo('<h1>'+err+'</h1>');
-            echo('<p>'+filename+'.md</p>');
+            echo('<p>'+mdpath+'</p>');
             exit();
           }
           else
           {
-            render('md_file_html',data.toString('utf8'));
-            render('md_file_path',filename);
+            render('mdhtml',data.toString('utf8'));
           }
         });
       }
     });
 ?>
+<?
+    if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
+    else SESSION.viewable = true;
+
+    if(!SESSION.viewable)
+    {
+        var html = "<h1>This topic can not be viewed</h1>" +
+            "<p>You need to login to view this document.</p>";
+        render('mdhtml',html);
+    }
+
+    if((SESSION.wikimode=='loginedit')&&(!SESSION.username)) SESSION.editable = false;
+    else if((SESSION.wikimode=='loginview')&&(!SESSION.username)) SESSION.editable = false;
+    else SESSION.editable = true;
+
+    var login = '<a href="javascript:var a=function(){return false;}" onclick="login()">Login</a>';
+    var logout= '<a href="javascript:var a=function(){return false;}" onclick="logout()">Logout('+
+                SESSION.username+')</a>';
+    render('loginout',SESSION.username?logout:login);
+
+    var label = T.mdexist?'Edit':'Create';
+    var edithtml = '<a href="'+T.mdpath+'?p=edit">' + label + '</a>';
+    render('edithtml',SESSION.editable?edithtml:'');
+
+    var admin = '<a href="javascript:var a=function(){return false;}" onclick="admin()">Admin</a>';
+    render('admin',SESSION.username?admin:'');
+ ?>
 
 <html>
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
     <script type="text/javascript" src="/static/jquery-1.12.0.min.js"></script>
+    <script type="text/javascript" src="/static/md5.js"></script>
     <script type="text/javascript" src="/static/jqueryFileTree.js"></script>
     <link rel="stylesheet" href="/static/jqueryFileTree.css" />
     <style type="text/css">
@@ -190,15 +220,17 @@
       <div class="headerbar">
         <div class="headermenu">
           <a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>
-          <a href="{{md_file_path}}?p=edit">{{EditCreate}}</a>
+          {{edithtml}}
+          {{admin}}
+          {{loginout}}
         </div>
       </div>
       <div class="main">     
 
         <div class="contentarea">
             <div id="sider" class="sider"></div>
-            <div id="show" class="show markdown-body">{{md_file_html}}</div>
-            <textarea id="textdata" data-path="{{md_file_path}}" style="display: none;"></textarea>
+            <div id="show" class="show markdown-body">{{mdhtml}}</div>
+            <textarea id="textdata" data-path="{{mdpath}}" style="display: none;"></textarea>
         </div>
         <div class="footarea">
           <div class="filelistmain">
@@ -263,6 +295,132 @@
           request.open("POST", "/search.jssp");
           request.send(formData);
         }
+
+        function login()
+        {
+            var html = '<div id="logindiv" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:100;'+
+              'background:rgba(255,255, 255, 0.9);">' +
+              '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"><fieldset>' +
+              '<legend>Login:</legend>' +
+              'Username: <input type="text" value="root"><br>' +
+              'Password: <input type="password"><br>' +
+              '<button onclick="loginc()">Cancel</button>  <button onclick="logins()">Login</button>' +
+              '</fieldset></div></div>';
+            var div = $(html);
+            div.css('position','fixed'); 
+            div.css('top','50%'); 
+            div.css('left','50%'); 
+            div.css('transform','translate(-50%, -50%)'); 
+ 
+            $('body').prepend(div);
+        }
+        function loginc()
+        {
+            $('#logindiv').remove();
+        }
+        function logins()
+        {
+            var name = $('#logindiv input')[0].value;
+            if(!name) { $($('#logindiv input')[0]).css("background","red"); return; }
+
+            var password = $('#logindiv input')[1].value;
+            password = md5('_mdwiki_'+password+'_mdwiki_');
+
+            $.get( "/user.jssp?op=login&name="+name+"&password="+password, function(data)
+            {
+                if('loginerror'==data)
+                {
+                    $('#logindiv input').css("background","red");
+                    $('#logindiv legend').html('Username or Password Error:')
+                }else
+                if('needsetpassword'==data)
+                {
+                    password = prompt("Please enter the "+name+"'s new password!","");
+                    if(!password) { logout(); return; }
+                    password = md5('_mdwiki_'+password+'_mdwiki_');
+                    changepassword(name,password,function(data)
+                    {
+                        location.reload();
+                    });
+                }else
+                if('ok'==data) { location.reload() }
+                else alert('Unknown Error: '+data);
+            });
+        }
+        function logout()
+        {
+            var ret = confirm("Do you really want to logout?");
+            if(!ret) return;
+            $.get( "/user.jssp?op=logout", function(data)
+            {
+                location.reload();
+            });
+        }
+        function changepassword(name,password,cb)
+        {
+            $.get( "/user.jssp?op=add&name="+name+"&password="+password, function(data)
+            {
+                if(cb) cb(data);
+            });
+        }
+
+        function admin()
+        {
+            var html = '<div id="admindiv" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:100;'+
+              'background:rgba(255,255, 255, 0.9);">' +
+              '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">' +
+              'userlist: <span></span><br>' +
+              'modelist: <span>everyone, loginedit, loginview</span><br>' +
+              '<button onclick="adduser()">Add User</button>  <button onclick="deluser()">Delete User</button>  ' +
+              '<button onclick="wikimode()">Wiki Mode</button>' +
+              '</div></div>';
+            var div = $(html);
+            div.css('position','fixed'); 
+            div.css('top','50%'); 
+            div.css('left','50%'); 
+            div.css('transform','translate(-50%, -50%)'); 
+ 
+            $('body').prepend(div);
+            $.get( "/user.jssp?op=list", function(data){ $($('#admindiv span')[0]).html(data) });
+        }
+        function adduser()
+        {
+            var name = prompt("Please enter the new username!","");
+            if(!name) { location.reload(); return; }
+            var reg = /^[a-zA-Z0-9]+$/;
+            if(!name.match(reg)) { alert('Only a-z A-Z 0-9 can be used for name!'); location.reload(); return; }
+            changepassword(name,'',function(data)
+            {
+                if('ok'==data) alert('Add user successful!');
+                else alert('Add user error: '+data);
+                location.reload();
+            });
+        }
+        function deluser()
+        {
+            var name = prompt("Please enter the username will be deleted!","");
+            if(!name) { location.reload(); return; }
+            $.get( "/user.jssp?op=delete&name="+name, function(data)
+            {
+                if('ok'==data) alert('Delete user successful!');
+                else alert('Delete user error: '+data);
+                location.reload();
+            });
+        }
+        function wikimode()
+        {
+            var mode = prompt("Please enter the new wikimode!","");
+            if(!mode) { location.reload(); return; }
+            $.get( "/user.jssp?op=setmode&mode="+mode, function(data)
+            {
+                if('ok'==data) alert('Set new mode successful!');
+                else alert('Set new mode error: '+data);
+                location.reload();
+            });
+        }
       </script>
   </body>
 </html>
+
+
+

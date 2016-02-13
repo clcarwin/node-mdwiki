@@ -1,4 +1,7 @@
 <?
+	session_start();
+	if(!SESSION.editable) return;
+
 	var fs = require('fs');
 	var path = require('path');
 	var filename = POST['mdpath'];

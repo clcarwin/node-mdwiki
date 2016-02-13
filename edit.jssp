@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?
     /*jssp code run on server*/
     var fs = require('fs');
@@ -21,8 +22,20 @@
       }
     });
 ?>
-
-<!DOCTYPE html>
+<?
+    session_start();
+    if(SESSION.editable) render('donotedit','');
+    else
+    {
+        var mdpath   = POST['mdpath'];
+        var js = '$(function(){' + 
+          'alert("Please login to edit this document!");' +
+          'window.location.href = "'+mdpath+'";' +
+          '});';
+        render('donotedit',js);
+        render('mddata','');
+    }
+?>
 <html>
   <head>
     <meta charset="utf-8">
@@ -187,11 +200,13 @@
         <!-- <div class="singlefile"><a href="" >test.txt</a><div></div></div> -->
       </div>
       <script type="text/javascript">
+        {{donotedit}}
+
         var text      = document.getElementById("textdata").value;
         $(function(){ editor.session.setValue(text); });
 
         $(function(){ //load attachmentlist
-          $.post( "/attachmentlist.jssp", function(data){ $( ".filelist" ).html(data) });
+          $.post( "/attachmentlist.jssp",{"mdpath":"{{mdpath}}"}, function(data){ $( ".filelist" ).html(data) });
         });
 
         //console.log(mdc.render(editor.session.getValue()))
