@@ -103,6 +103,13 @@
           height: 25px;
           margin: 10px;
       }
+      .footbar div {
+          width: 80px;
+          float: right;
+          height: 25px;
+          margin: 10px;
+          font-size: 12px;
+      }
       .filelist {
           width: calc(100% - 30px);
           position: absolute;
@@ -190,10 +197,11 @@
         </div>
       </div>
       <div class="footbar">
-        <button  onclick="postfile()">Save</button>
-        <button  onclick="cancelfile()">Cancel</button>
+        <button onclick="postfile()">Save</button>
+        <button onclick="cancelfile()">Cancel</button>
         <input type="file" id="fileElem" style="display:none" onchange="handleFiles(this.files)">
         <button id="fileSelect">Upload</button>
+        <div><input type="checkbox" >admin</div>
         <textarea id="textdata" data-path="{{mdpath}}" style="display: none;">{{mddata}}</textarea>
       </div>
       <div class="filelist">
