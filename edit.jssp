@@ -110,19 +110,11 @@
               if(result) handleFiles(files,'drop');
             });
 
-            $('.ui-layout-resizer').off('click');
-            $('.ui-layout-toggler').off('click');
-
             $('#preview').dblclick(function()
             {
                 if(layout.state.center.isClosed) { layout.sizePane('east','50%'); layout.state.center.isClosed = false; }
                 else { layout.sizePane('east','100%'); layout.state.center.isClosed = true; }
                 layout.open('east');
-            })
-            $('#editor').dblclick(function()
-            {
-                if(layout.state.east.isClosed) { layout.sizePane('east','50%'); layout.open('east'); }
-                else { layout.close('east'); }
             })
         });
       </script>

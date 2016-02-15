@@ -1,0 +1,20 @@
+<?
+	session_start();
+	if(!SESSION.editable) return;
+
+	header("Content-Type","application/x-gzip");
+	header("Content-Disposition","attachment; filename=mdwiki-backup.tar.gz"); 
+	header("Content-Transfer-Encoding","binary");
+
+	var spawn = require('child_process').spawn;
+
+	var args = ["czf", "-", "-C", __dirname, "wikiconfig", "wiki"];
+	var tar = spawn('tar',args);
+	tar.stdout.on('data',function(data)
+	{
+		echo(data);
+	});
+	tar.on('exit',function()
+	{
+		//end
+	});

@@ -98,12 +98,17 @@ function admin()
       'user: <span></span><br>' +
       'mode: <span>everyone, loginedit, loginview</span><br><br>' +
       '<button onclick="adduser()">Add User</button>  <button onclick="deluser()">Delete User</button>  ' +
-      '<button onclick="wikimode()">Wiki Mode</button>  <button onclick="wikiname()">Wiki Name</button>  <br>' +
+      '<button onclick="wikimode()">Wiki Mode</button>  <button onclick="wikiname()">Wiki Name</button>  ' +
+      '<button onclick="backup()">Backup</button>  <br>' +
       '<button onclick="logout()">Logout</button>' +
       '</div></div>';
     var div = $(html);
     $('body').prepend(div);
     $.get( "/user.jssp?op=list", function(data){ $($('#admindiv span')[0]).html(data) });
+}
+function admincancel()
+{
+    $('#admindiv').remove();
 }
 function adduser()
 {
@@ -152,10 +157,16 @@ function wikiname()
         location.reload();
     });
 }
+function backup()
+{
+    var ret = confirm("Do you really want to backup the whole wiki?");
+    if(!ret) { admincancel(); return; }
+    window.location.href = "/backup.jssp";
+    admincancel();
+}
 
 
 //edit
-
 function postfile()
 {
   var mdtext = editor.session.getValue();
