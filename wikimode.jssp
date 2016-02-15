@@ -5,17 +5,34 @@
 	var configobj = {};
 	fs.readFile(__dirname + '/wikiconfig', 'utf8',function(err, data)
 	{
-		if(err) configobj.wikimode = 'loginedit';
+		if(err) read_config_error();
 		else
 		{
-			try{ configobj = JSON.parse(config) }catch(e){}
+			try{ configobj = JSON.parse(data) }catch(e){ read_config_error() }
 		}
 
-		if(!configobj.wikimode) configobj.wikimode = 'loginedit';
-		SESSION.wikimode = configobj.wikimode;
+		GLOBAL.wikimode   = configobj.wikimode;
+		GLOBAL.wikiname   = configobj.wikiname;
+		GLOBAL.configobj  = configobj;
 
-		if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
+		if( (GLOBAL.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
 	    else SESSION.viewable = true;
-	    if( (SESSION.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
+	    if( (GLOBAL.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
 	    else SESSION.editable = false;
+
+	    GLOBAL.usercount = 0;
+	    for(var key in configobj.user) GLOBAL.usercount++;
+	    for(var key in configobj.user) GLOBAL.userdefault=key;
+	    if(GLOBAL.usercount>1) GLOBAL.userdefault='';
 	});
+
+	function read_config_error()
+	{
+		configobj = {};
+		configobj.wikimode = 'loginedit';	//everyone loginedit loginview
+		configobj.user = {};
+		configobj.user['root'] = '';
+
+		var config = JSON.stringify(configobj);
+		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+	}

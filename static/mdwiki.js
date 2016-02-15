@@ -27,12 +27,18 @@ function login()
       'background:rgba(255,255, 255, 0.9);">' +
       '<div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); padding:.5em; background:white"><fieldset>' +
       '<legend>Login</legend>' +
-      '<span>Username: </span><input type="text" style="float:right" value="root"><br>' +
+      '<span>Username: </span><input type="text" style="float:right" value=""><br>' +
       '<span>Password: </span><input type="password"style="float:right"><br>' +
       '<button onclick="logincancel()">Cancel</button>  <button onclick="loginsubmit()">Login</button>' +
       '</fieldset></div></div>';
     var div = $(html);
     $('body').prepend(div);
+    if(userdefault) { $('#logindiv input')[0].value=userdefault; $('#logindiv input')[1].focus(); }
+    else $('#logindiv input')[0].focus();
+
+    $($('#logindiv input')[1]).keypress(function(e){
+      if(e.keyCode==13) loginsubmit();
+    });
 }
 function logincancel()
 {
@@ -92,7 +98,7 @@ function admin()
       'user: <span></span><br>' +
       'mode: <span>everyone, loginedit, loginview</span><br><br>' +
       '<button onclick="adduser()">Add User</button>  <button onclick="deluser()">Delete User</button>  ' +
-      '<button onclick="wikimode()">Wiki Mode</button><br>' +
+      '<button onclick="wikimode()">Wiki Mode</button>  <button onclick="wikiname()">Wiki Name</button>  <br>' +
       '<button onclick="logout()">Logout</button>' +
       '</div></div>';
     var div = $(html);
@@ -132,6 +138,17 @@ function wikimode()
     {
         if('ok'==data) alert('Set new mode successful!');
         else alert('Set new mode error: '+data);
+        location.reload();
+    });
+}
+function wikiname()
+{
+    var name = prompt("Please enter the new wiki's name!","");
+    if(null==name) { location.reload(); return; }
+    $.get( "/user.jssp?op=setwikiname&wikiname="+name, function(data)
+    {
+        if('ok'==data) alert("Set new wiki's name successful!");
+        else alert('Set new name error: '+data);
         location.reload();
     });
 }

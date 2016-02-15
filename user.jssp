@@ -1,44 +1,30 @@
 <?
+	include('wikimode.jssp');
+?><?
 	var fs = require('fs');
 	session_start();
 
-	//op="add"&name="carwin"&password="eeffeefefefefeefeaa"&mode="loginedit"
-	//op = add delete login loginout list getmode setmode
+	//op="add"&name="carwin"&password="eeffeefefefefeefeaa"&mode="loginedit"&wikiname=xx
+	//op = add delete login loginout list getmode setmode setwikiname
 	var op = GET['op'];
 	var name = GET['name'];
 	var password = GET['password'];
 	var mode = GET['mode'];
+	var wikiname = GET['wikiname'];
 
-	var config = '';
-	try{ config = fs.readFileSync(__dirname + '/wikiconfig', 'utf8') }catch(e){}
-	var configobj = {};
-	try{ configobj = JSON.parse(config) }catch(e){}
-	if(!configobj.wikimode)
-	{
-		configobj.wikimode = 'loginedit';	//everyone loginedit loginview
-		configobj.user = {};
-		configobj.user['root'] = '';
-
-		config = JSON.stringify(configobj);
-		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
-	}
-	SESSION.wikimode = configobj.wikimode;
-	
-
+	var configobj = GLOBAL.configobj;
 	if('login'==op)
 	{
 		var truepassword = configobj.user[name];
 		if(truepassword=='')
 		{
 			SESSION.username = name;
-			SESSION.wikimode = configobj.wikimode;
 			echo('needsetpassword');
 		}
 		else
 		if(truepassword==password)
 		{
 			SESSION.username = name;
-			SESSION.wikimode = configobj.wikimode;
 			echo('ok');
 		}
 		else echo('loginerror');
@@ -58,7 +44,7 @@
 	{
 		configobj.user[name] = password;
 		config = JSON.stringify(configobj);
-		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
 		echo('ok');
 	}
 	else
@@ -77,7 +63,7 @@
 			if(name==SESSION.username) delete SESSION.username;
 
 			config = JSON.stringify(configobj);
-			fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+			fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
 			echo('ok');
 		}
 	}
@@ -95,14 +81,24 @@
 		if(["everyone","loginedit","loginview"].indexOf(mode)<0) echo('modeerror');
 
 		configobj.wikimode = mode;
-		SESSION.wikimode = configobj.wikimode;
+		GLOBAL.wikimode = configobj.wikimode;
 
 		config = JSON.stringify(configobj);
-		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
 		echo('ok');
 	}
 	else
 	if('getmode'==op) echo(configobj.wikimode);
+	else
+	if('setwikiname'==op)
+	{
+		configobj.wikiname = wikiname;
+		GLOBAL.wikiname = configobj.wikiname;
+
+		config = JSON.stringify(configobj);
+		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+		echo('ok');
+	}
 
 
 

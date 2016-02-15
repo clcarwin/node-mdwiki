@@ -41,9 +41,12 @@
         render('donotedit',js);
         render('mddata','');
     }
+
+    render('title',GLOBAL.wikiname?'<title>'+GLOBAL.wikiname+'</title>':'');
 ?>
 <html>
   <head>
+    {{title}}
     <meta charset="utf-8">
     <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
     <script type="text/javascript" src="/static/markdown-plus.min.js"></script>

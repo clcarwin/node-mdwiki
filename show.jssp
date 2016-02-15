@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <?
     session_start();
-    if(!SESSION.wikimode) include('wikimode.jssp');
-    render('username',SESSION.username ? SESSION.username:'');
-?>
-<?
+    if(!GLOBAL.wikimode) include('wikimode.jssp');
+    render('userdefault',GLOBAL.userdefault);
+    render('title',GLOBAL.wikiname?'<title>'+GLOBAL.wikiname+'</title>':'');
+?><?
     /*jssp code run on server*/
     var fs = require('fs');
     var mdpath   = POST['mdpath'];
@@ -42,11 +42,10 @@
         });
       }
     });
-?>
-<?
-    if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
+?><?
+    if( (GLOBAL.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
     else SESSION.viewable = true;
-    if( (SESSION.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
+    if( (GLOBAL.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
     else SESSION.editable = false;
 
     if(!SESSION.viewable)
@@ -86,6 +85,7 @@
 
 <html>
   <head>
+    {{title}}
     <meta charset="utf-8">
     <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
     <script type="text/javascript" src="/static/jquery-1.12.0.min.js"></script>
@@ -121,6 +121,7 @@
       <script type="text/javascript">
         var mdpath = $('#textdata').attr('data-path');
         var mdpathlong = mdpath;
+        var userdefault = "{{userdefault}}";
 
         $(function () {
             if( $('.mermaid').size()>0 ) {
@@ -146,6 +147,8 @@
                 if(mdpathlong.indexOf(rel)>=0) $(this).triggerHandler('click','fastexpanded');
               });
             });
+
+            if(0!=$('.singlefile').length) $('.showfilelist').show();
         });
       </script>
   </body>

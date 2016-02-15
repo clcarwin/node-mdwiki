@@ -194,10 +194,18 @@ pre {
 .showarea .singlefile {
     margin: 3px 15px 1px 0px;
 }
+
 .showfilelist {
     margin: 40px 0 0 0;
     padding: 10px 0 0 0;
     border-top: 1px dashed;
+    display: none;
+}
+.showfilelist .insert {
+    display: none;
+}
+.showfilelist .closefile {
+    display: none;
 }
 
 .searchtext {
