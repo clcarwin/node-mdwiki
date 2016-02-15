@@ -45,6 +45,12 @@
 		configobj.user[name] = password;
 		config = JSON.stringify(configobj);
 		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+
+		GLOBAL.usercount = 0;
+	    for(var key in configobj.user) GLOBAL.usercount++;
+	    for(var key in configobj.user) GLOBAL.userdefault=key;
+	    if(GLOBAL.usercount>1) GLOBAL.userdefault='';
+		
 		echo('ok');
 	}
 	else
@@ -64,6 +70,12 @@
 
 			config = JSON.stringify(configobj);
 			fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+
+			GLOBAL.usercount = 0;
+		    for(var key in configobj.user) GLOBAL.usercount++;
+		    for(var key in configobj.user) GLOBAL.userdefault=key;
+		    if(GLOBAL.usercount>1) GLOBAL.userdefault='';
+
 			echo('ok');
 		}
 	}
@@ -99,7 +111,5 @@
 		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
 		echo('ok');
 	}
-
-
 
 
