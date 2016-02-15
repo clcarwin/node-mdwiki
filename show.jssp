@@ -2,8 +2,6 @@
 <?
     session_start();
     if(!GLOBAL.wikimode) include('wikimode.jssp');
-    render('userdefault',GLOBAL.userdefault);
-    render('title',GLOBAL.wikiname?'<title>'+GLOBAL.wikiname+'</title>':'');
 ?><?
     /*jssp code run on server*/
     var fs = require('fs');
@@ -81,6 +79,9 @@
             if(!err) render('loginview',true);
         });
     }
+
+    render('userdefault',GLOBAL.userdefault);
+    render('title',GLOBAL.wikiname?'<title>'+GLOBAL.wikiname+'</title>':'');
 ?>
 
 <html>
