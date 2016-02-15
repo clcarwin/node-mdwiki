@@ -1,0 +1,35 @@
+<?
+	var fs = require('fs');
+	var path = require('path');
+
+	session_start();
+	if(!SESSION.viewable) return;
+
+	var filename = POST['filename'];	//'/a/python/builddoc/cc.png'
+	filename = filename.slice(2);
+	filename = path.normalize(filename);
+
+	var filefullpath = __dirname + '/wiki/' + filename;
+	var filedir  = path.dirname(filefullpath);
+	var name = path.basename(filefullpath);
+	var filemdpath = filedir+'.md';
+	var filerealpath = filedir+'.md.list/'+name;
+
+	fs.stat(filerealpath,function(err,stats)
+	{
+		if(err) {
+			echo('<h1>404 Not Found</h1>');
+			echo('<p>'+SERVER['HTTP_HOST']+'/'+filename+'</p>');
+		}
+		else
+		{
+			fs.readFile(filerealpath,function(err,data)
+			{
+				if(err) {
+					echo('<h1>'+err+'</h1>');
+		            echo('<p>'+filename+'.md</p>');
+				}
+				else echo(data);
+			});
+		}
+	});

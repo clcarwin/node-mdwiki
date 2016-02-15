@@ -49,9 +49,12 @@
 		render('mdpath',mdpath);
 	});
 ?>
-{{<div class="singlefile"><a href="{{mdpath}}/{{sl[i].name}}" >{{sl[i].name}}</a>
+{{<div class="singlefile"><a href="/a{{mdpath}}/{{sl[i].name}}" >{{sl[i].name}}</a>
   <div class="sizelabel">({{sl[i].sizelabel}})</div>
   <a class="insert" onclick="ii(this,'{{mdpath}}','{{sl[i].name}}')">insert</a>
   <a class="insert {{sl[i].img}}" onclick="ii2(this,'{{mdpath}}','{{sl[i].name}}')">img</a>
   <div class="closefile" onclick="pp(this,'{{mdpath}}','{{sl[i].name}}')"></div>
 </div>}}
+
+
+

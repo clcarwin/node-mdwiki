@@ -6,20 +6,26 @@
 
     var mdpath   = POST['mdpath'];
     var path = __dirname + '/wiki/' + mdpath + '.md';
+    var lvpath = path + '.lv';
 
     render('mdpath',mdpath);
 
     fs.stat(path,function(err,stats)
     {
-      if(err){ render('mddata','') }
-      else
-      {
-        fs.readFile(path, function(err, data)
+        if(err){ render('mddata','') }
+        else
         {
-          if(err) render('mddata','');
-          else    render('mddata',data.toString('utf8'));
-        });
-      }
+            fs.readFile(path, function(err, data)
+            {
+                if(err) render('mddata','');
+                else    render('mddata',data.toString('utf8'));
+            });
+        }
+    });
+    fs.stat(lvpath,function(err,stats)
+    {
+        if(err) render('loginviewchecked','');
+        else render('loginviewchecked','checked');
     });
 ?>
 <?
@@ -46,11 +52,7 @@
       }
       
       pre {
-          white-space: pre-wrap;       /* css-3 */
-          white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-          white-space: -pre-wrap;      /* Opera 4-6 */
-          white-space: -o-pre-wrap;    /* Opera 7 */
-          word-wrap: break-word;       /* Internet Explorer 5.5+ */
+          white-space: pre-wrap;
           background-color: #f8f8f8;
           border: 1px solid #dfdfdf;
           margin-top: 1.5em;
@@ -68,8 +70,9 @@
       
       .headerbar {
         top: 0px;
-        height: 45px;
-        background: #ffe;
+        height: 44px;
+        background: #f8f8f8;
+        border-bottom: 1px solid #808080;
       }
 
       .headermenu {
@@ -94,9 +97,10 @@
       .footbar {
           position: absolute;
           width: 100%;
-          height: 45px;
+          height: 44px;
           bottom: 0px;
-          background: #fef;
+          background: #f8f8f8;
+          border-top: 1px solid #808080;
       }
       .footbar button {
           width: 80px;
@@ -104,7 +108,6 @@
           margin: 10px;
       }
       .footbar div {
-          width: 80px;
           float: right;
           height: 25px;
           margin: 10px;
@@ -201,7 +204,7 @@
         <button onclick="cancelfile()">Cancel</button>
         <input type="file" id="fileElem" style="display:none" onchange="handleFiles(this.files)">
         <button id="fileSelect">Upload</button>
-        <div><input type="checkbox" >admin</div>
+        <div><input id='loginviewcheck' type="checkbox" {{loginviewchecked}}>login to view</div>
         <textarea id="textdata" data-path="{{mdpath}}" style="display: none;">{{mddata}}</textarea>
       </div>
       <div class="filelist">
@@ -223,10 +226,13 @@
           var mdtext = editor.session.getValue();
           var mdhtml = mdc.render(mdtext);
           var mdpath = $('#textdata').attr('data-path');
+          var lovinview = $('#loginviewcheck')[0].checked;
+
           var formData = new FormData();
           formData.append("mdtext",mdtext);
           formData.append("mdhtml",mdhtml);
           formData.append("mdpath",mdpath);
+          if(lovinview) formData.append("loginview","true");
 
           var request = new XMLHttpRequest();
           request.onreadystatechange = function() {
@@ -295,11 +301,11 @@
           var pre = "";
 
           if(['.png','.jpg','.bmp','.gif','jpeg'].indexOf(ext)>=0) pre="!";
-          editor.insert("\n"+pre+"["+filename+"]("+mdpath+"/"+filename+")\n");
+          editor.insert("\n"+pre+"["+filename+"](/a"+mdpath+"/"+filename+")\n");
         }
         function ii2(obj,mdpath,filename)
         {
-          var html = '\n<img src="'+mdpath+'/'+filename+'" width="500">\n';
+          var html = '\n<img src="/a'+mdpath+'/'+filename+'" width="500">\n';
           editor.insert(html);
         }
         function pp(obj,mdpath,filename)

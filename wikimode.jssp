@@ -16,8 +16,6 @@
 
 		if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
 	    else SESSION.viewable = true;
-
-	    if((SESSION.wikimode=='loginedit')&&(!SESSION.username)) SESSION.editable = false;
-	    else if((SESSION.wikimode=='loginview')&&(!SESSION.username)) SESSION.editable = false;
-	    else SESSION.editable = true;
+	    if( (SESSION.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
+	    else SESSION.editable = false;
 	});

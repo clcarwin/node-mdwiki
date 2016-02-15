@@ -8,10 +8,16 @@
 	var urlobj = url.parse(POST['REQUEST']);
 	var filename = urlobj.pathname;
 
-	if(filename.indexOf('.')>=0)
+	if(filename.indexOf('/a/')==0)
 	{
 		POST['filename'] = filename;
-		include('download.jssp');
+		include('downloadattachment.jssp');
+	}
+	else
+	if(filename.indexOf('/static/')==0)
+	{
+		POST['filename'] = filename;
+		include('downloadstatic.jssp');
 	}
 	else
 	{

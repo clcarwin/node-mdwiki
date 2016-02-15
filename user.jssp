@@ -64,12 +64,22 @@
 	else
 	if('delete'==op)
 	{
-		delete configobj.user[name];
-		if(name==SESSION.username) delete SESSION.username;
+		var count = 0;
+		for(var key in configobj.user) count++;
 
-		config = JSON.stringify(configobj);
-		fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
-		echo('ok');
+		if(count==1)
+		{
+			echo('lastusererror');
+		}
+		else
+		{
+			delete configobj.user[name];
+			if(name==SESSION.username) delete SESSION.username;
+
+			config = JSON.stringify(configobj);
+			fs.writeFileSync(__dirname + '/wikiconfig', config, 'utf8');
+			echo('ok');
+		}
 	}
 	else
 	if('list'==op)

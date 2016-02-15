@@ -8,9 +8,11 @@
 
 	var textfile = __dirname + '/wiki/' + filename + '.md';
 	var htmlfile = __dirname + '/wiki/' + filename + '.md.html';
+	var lvfile   = __dirname + '/wiki/' + filename + '.md.lv';
 	var mddir    = __dirname + '/wiki/' + filename + '.md.list';
 	var mdtext   = POST['mdtext'];
 	var mdhtml   = POST['mdhtml'];
+	var loginview= POST['loginview'];
 
 	function mkdir(path, root)
 	{
@@ -44,11 +46,14 @@
 	{
 		fs.writeFile(textfile,mdtext);
 		fs.writeFile(htmlfile,mdhtml);
+		if(loginview) fs.writeFile(lvfile,  '');
+		else fs.unlink(lvfile);
 	}
 	else
 	{
 		try{ fs.unlinkSync(textfile) }catch(e){}
 		try{ fs.unlinkSync(htmlfile) }catch(e){}
+		try{ fs.unlinkSync(lvfile)   }catch(e){}
 		rm_dir(mddir);
 
 		var basedir = __dirname + '/wiki/';

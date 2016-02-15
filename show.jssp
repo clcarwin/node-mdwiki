@@ -46,6 +46,8 @@
 <?
     if( (SESSION.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
     else SESSION.viewable = true;
+    if( (SESSION.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
+    else SESSION.editable = false;
 
     if(!SESSION.viewable)
     {
@@ -54,21 +56,32 @@
         render('mdhtml',html);
     }
 
-    if((SESSION.wikimode=='loginedit')&&(!SESSION.username)) SESSION.editable = false;
-    else if((SESSION.wikimode=='loginview')&&(!SESSION.username)) SESSION.editable = false;
-    else SESSION.editable = true;
-
     var login = '<a href="javascript:var a=function(){return false;}" onclick="login()">Login</a>';
-    var logout= '<a href="javascript:var a=function(){return false;}" onclick="logout()">Logout('+
-                SESSION.username+')</a>';
-    render('loginout',SESSION.username?logout:login);
+    var user= '<a href="javascript:var a=function(){return false;}" ' +
+                'onclick="admin()">' + SESSION.username+'</a>';
+    render('userhtml',SESSION.username?user:login);
 
     var label = T.mdexist?'Edit':'Create';
     var edithtml = '<a href="'+T.mdpath+'?p=edit">' + label + '</a>';
     render('edithtml',SESSION.editable?edithtml:'');
 
-    var admin = '<a href="javascript:var a=function(){return false;}" onclick="admin()">Admin</a>';
-    render('admin',SESSION.username?admin:'');
+    var searchhtml = '<a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>';
+    render('searchhtml',SESSION.editable?searchhtml:'');
+
+    if((!SESSION.username)&&(SESSION.viewable))
+    {
+        var fs = require('fs');
+        var mdpath   = POST['mdpath'];
+        var lvpath  = __dirname + '/wiki/' + mdpath + '.md.lv';
+
+        fs.stat(lvpath,function(err,stats)
+        {
+            var html = "<h1>This topic can not be viewed</h1>" +
+            "<p>You need to login to view this document. An access permission has been set.</p>";
+            if(!err) render('mdhtml',html);
+            if(!err) render('loginview',true);
+        });
+    }
  ?>
 
 <html>
@@ -85,11 +98,7 @@
         margin: 0px;
       }
       pre {
-          white-space: pre-wrap;       /* css-3 */
-          white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-          white-space: -pre-wrap;      /* Opera 4-6 */
-          white-space: -o-pre-wrap;    /* Opera 7 */
-          word-wrap: break-word;       /* Internet Explorer 5.5+ */
+          white-space: pre-wrap;
           background-color: #f8f8f8;
           border: 1px solid #dfdfdf;
           margin-top: 1.5em;
@@ -103,6 +112,21 @@
           padding: 0;
           white-space: pre-wrap;
           word-wrap: break-word;
+      }
+
+      button {
+          width: 80px;
+          height: 25px;
+          margin-top: 4px;
+          margin-bottom: 8px;
+          margin-right: 8px;
+      }
+
+      fieldset {
+          /*width: 300px;*/
+          border: 2px solid #ccc;
+          padding: .5em;
+          margin: auto;
       }
 
       .mermaid {
@@ -214,15 +238,18 @@
       .searchtext {
           background-color: #ffff99;
       }
+
+      #admindiv {
+          min-width: 400px;
+      }
     </style>
   </head>
   <body>
       <div class="headerbar">
         <div class="headermenu">
-          <a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>
+          {{searchhtml}}
           {{edithtml}}
-          {{admin}}
-          {{loginout}}
+          {{userhtml}}
         </div>
       </div>
       <div class="main">     
@@ -236,7 +263,7 @@
           <div class="filelistmain">
             <div class="filelistspace"></div>
             <div class="filelist">
-              <? include('attachmentlist.jssp'); ?>
+              <? if((SESSION.username)||(!T.loginview)) include('attachmentlist.jssp'); ?>
             </div>
           </div>
         </div> 
@@ -298,20 +325,15 @@
 
         function login()
         {
-            var html = '<div id="logindiv" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:100;'+
+            var html = '<div id="logindiv" style="position: fixed; top:0; left:0; width:100%; height:100%; z-index:100;'+
               'background:rgba(255,255, 255, 0.9);">' +
-              '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"><fieldset>' +
-              '<legend>Login:</legend>' +
-              'Username: <input type="text" value="root"><br>' +
-              'Password: <input type="password"><br>' +
+              '<div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); padding:.5em; background:white"><fieldset>' +
+              '<legend>Login</legend>' +
+              '<span>Username: </span><input type="text" style="float:right" value="root"><br>' +
+              '<span>Password: </span><input type="password"style="float:right"><br>' +
               '<button onclick="loginc()">Cancel</button>  <button onclick="logins()">Login</button>' +
               '</fieldset></div></div>';
             var div = $(html);
-            div.css('position','fixed'); 
-            div.css('top','50%'); 
-            div.css('left','50%'); 
-            div.css('transform','translate(-50%, -50%)'); 
- 
             $('body').prepend(div);
         }
         function loginc()
@@ -331,12 +353,12 @@
                 if('loginerror'==data)
                 {
                     $('#logindiv input').css("background","red");
-                    $('#logindiv legend').html('Username or Password Error:')
+                    $('#logindiv legend').html('Username or Password Error')
                 }else
                 if('needsetpassword'==data)
                 {
-                    password = prompt("Please enter the "+name+"'s new password!","");
-                    if(!password) { logout(); return; }
+                    password = prompt("The "+name+"'s password is empty, please enter the new password!","");
+                    if(!password) { logout('silent'); return; }
                     password = md5('_mdwiki_'+password+'_mdwiki_');
                     changepassword(name,password,function(data)
                     {
@@ -347,10 +369,10 @@
                 else alert('Unknown Error: '+data);
             });
         }
-        function logout()
+        function logout(silent)
         {
-            var ret = confirm("Do you really want to logout?");
-            if(!ret) return;
+            if(!silent) var ret = confirm("Do you really want to logout?");
+            if(!silent) if(!ret) return;
             $.get( "/user.jssp?op=logout", function(data)
             {
                 location.reload();
@@ -366,20 +388,16 @@
 
         function admin()
         {
-            var html = '<div id="admindiv" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:100;'+
-              'background:rgba(255,255, 255, 0.9);">' +
-              '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">' +
-              'userlist: <span></span><br>' +
-              'modelist: <span>everyone, loginedit, loginview</span><br>' +
+            var html = '<div id="admindiv" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:100;'+
+              'background:rgba(255,255,255,0.9);">' +
+              '<div style="position:fixed; top:20%; left:50%; transform:translate(-50%,-50%); padding:.5em; background:white">' +
+              'user: <span></span><br>' +
+              'mode: <span>everyone, loginedit, loginview</span><br><br>' +
               '<button onclick="adduser()">Add User</button>  <button onclick="deluser()">Delete User</button>  ' +
-              '<button onclick="wikimode()">Wiki Mode</button>' +
+              '<button onclick="wikimode()">Wiki Mode</button><br>' +
+              '<button onclick="logout()">Logout</button>' +
               '</div></div>';
             var div = $(html);
-            div.css('position','fixed'); 
-            div.css('top','50%'); 
-            div.css('left','50%'); 
-            div.css('transform','translate(-50%, -50%)'); 
- 
             $('body').prepend(div);
             $.get( "/user.jssp?op=list", function(data){ $($('#admindiv span')[0]).html(data) });
         }
@@ -403,6 +421,7 @@
             $.get( "/user.jssp?op=delete&name="+name, function(data)
             {
                 if('ok'==data) alert('Delete user successful!');
+                else if('lastusererror'==data) alert('Last user can not be deleted!');
                 else alert('Delete user error: '+data);
                 location.reload();
             });
