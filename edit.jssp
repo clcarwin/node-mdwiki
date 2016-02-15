@@ -45,149 +45,18 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <style type="text/css">
-      body {
-        background: #f8f8f8;
-        margin: 0px;
-      }
-      
-      pre {
-          white-space: pre-wrap;
-          background-color: #f8f8f8;
-          border: 1px solid #dfdfdf;
-          margin-top: 1.5em;
-          margin-bottom: 1.5em;
-          padding: 0.125rem 0.3125rem 0.0625rem;
-      }
-
-      .main .markdown-body pre code {
-          background-color: transparent;
-          border: 0;
-          padding: 0;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-      }
-      
-      .headerbar {
-        top: 0px;
-        height: 44px;
-        background: #f8f8f8;
-        border-bottom: 1px solid #808080;
-      }
-
-      .headermenu {
-        float: right;
-        margin: 20px 40px 10px 40px;
-      }
-      .main {
-          position: absolute;
-          width: 100%;
-          height: calc(100% - 90px);
-          top: 45px;
-      }
-      .contentarea {
-          background: #dde;
-          position: absolute;
-          width: 100%; 
-          height: calc(100% - 0px);
-          top: 0px;
-          float: left;
-          margin: 0;
-      }
-      .footbar {
-          position: absolute;
-          width: 100%;
-          height: 44px;
-          bottom: 0px;
-          background: #f8f8f8;
-          border-top: 1px solid #808080;
-      }
-      .footbar button {
-          width: 80px;
-          height: 25px;
-          margin: 10px;
-      }
-      .footbar div {
-          float: right;
-          height: 25px;
-          margin: 10px;
-          font-size: 12px;
-      }
-      .filelist {
-          width: calc(100% - 30px);
-          position: absolute;
-          top: calc(100%);
-      }
-      .singlefile {
-          width: calc(50% - 30px);
-          height: 21px;
-          background: #ede;
-          margin: 1px 0px 1px 10px;
-          padding: 0px 0px 0px 15px;
-          background-color: #f5f5f5;
-          border: 1px solid #dcdcdc;
-          float: left;
-      }
-      .singlefile:last-child 
-      {
-          margin-bottom: 40px;
-      }
-
-      .singlefile a {
-          color: #15c;
-          font-weight: bold;
-          font-size: 13px;
-          font-family: arial,sans-serif;
-
-          display: inline-block;
-          overflow: hidden;
-          padding: 3px 0;
-          text-overflow: ellipsis;
-          vertical-align: bottom;
-          white-space: nowrap;
-          max-width: 315px;
-          text-decoration: none;
-          vertical-align: middle;
-          cursor: pointer;
-      }
-      .singlefile .insert {
-          font-weight: normal;
-          margin-left: 15px;
-      }
-      .singlefile .closefile {
-          background: url('/static/button_delete.png') no-repeat 0 0;
-          cursor: pointer;
-          float: right;
-          height: 16px;
-          margin-top: 1px;
-          opacity: .5;
-          width: 16px;
-          right: 10px;
-          position: relative;
-      }
-      .singlefile .sizelabel {
-          color: #777;
-          font-weight: bold;
-          font-size: 13px;
-          font-family: arial,sans-serif;
-          display: inline-block;
-          padding: 3px 0;
-      }
-      .singlefile .notimage {
-          display: none;
-      }
-
-    </style>
     <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
     <script type="text/javascript" src="/static/markdown-plus.min.js"></script>
+    <link rel="stylesheet" href="/static/mdwiki.css"/>
+    <script type="text/javascript" src="/static/mdwiki.js"></script>
   </head>
   <body>
-      <div class="headerbar">
+<!--       <div class="headerbar">
         <div class="headermenu">
           <a href="javascript:var a=function(){return false;}" onclick="postfile()">Save</a>
         </div>
-      </div>
-      <div class="main">     
+      </div> -->
+      <div class="editmain">     
 
         <div class="contentarea">
             <div class="ui-layout-center">
@@ -213,171 +82,45 @@
       <script type="text/javascript">
         {{donotedit}}
 
-        var text      = document.getElementById("textdata").value;
-        $(function(){ editor.session.setValue(text); });
+        $(function(){
+            var text = document.getElementById("textdata").value;
+            editor.session.setValue(text);
 
-        $(function(){ //load attachmentlist
-          $.post( "/attachmentlist.jssp",{"mdpath":"{{mdpath}}"}, function(data){ $( ".filelist" ).html(data) });
-        });
+            $.post( "/attachmentlist.jssp",{"mdpath":"{{mdpath}}"}, function(data){ $( ".filelist" ).html(data) });
 
-        //console.log(mdc.render(editor.session.getValue()))
-        function postfile()
-        {
-          var mdtext = editor.session.getValue();
-          var mdhtml = mdc.render(mdtext);
-          var mdpath = $('#textdata').attr('data-path');
-          var lovinview = $('#loginviewcheck')[0].checked;
+            var fileSelect = document.getElementById("fileSelect"),
+            fileElem = document.getElementById("fileElem");
+            fileSelect.addEventListener("click", function (e) 
+            {
+              if (fileElem) { fileElem.click() }
+              e.preventDefault(); // prevent navigation to "#"
+            }, false);
 
-          var formData = new FormData();
-          formData.append("mdtext",mdtext);
-          formData.append("mdhtml",mdhtml);
-          formData.append("mdpath",mdpath);
-          if(lovinview) formData.append("loginview","true");
+            document.onpaste = pasteimageupload;
 
-          var request = new XMLHttpRequest();
-          request.onreadystatechange = function() {
-              if (request.readyState == XMLHttpRequest.DONE) {
-                  if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
-                  window.location.href = mdpath;
-              }
-          }
+            $('body').on('drop',function (event) {
+              event.preventDefault();
+            });
+            $('body').on('drop',function (event) {
+              var files = event.originalEvent.dataTransfer.files;
+              var result = confirm("Do you really want to upload the file '"+files[0].name+"'?");
+              if(result) handleFiles(files,'drop');
+            });
 
-          request.open("POST", "/postmd.jssp");
-          request.send(formData);
-        }
+            $('.ui-layout-resizer').off('click');
+            $('.ui-layout-toggler').off('click');
 
-        function cancelfile()
-        {
-          var mdpath = $('#textdata').attr('data-path');
-          window.location.href = mdpath;
-        }
-
-
-        var fileSelect = document.getElementById("fileSelect"),
-        fileElem = document.getElementById("fileElem");
-
-        fileSelect.addEventListener("click", function (e) 
-        {
-          if (fileElem) { fileElem.click() }
-          e.preventDefault(); // prevent navigation to "#"
-        }, false);
-
-        function handleFiles(files,method)
-        {
-          var mdpath = $('#textdata').attr('data-path');
-          var formData = new FormData();
-          formData.append("upload",files[0],files[0].name);
-          formData.append("mdpath",mdpath);
-          var request = new XMLHttpRequest();
-          request.upload.addEventListener("progress", postprogress);
-          request.onreadystatechange = function() {
-              if (request.readyState == XMLHttpRequest.DONE) {
-                var html = request.responseText;
-                $('.filelist').html(html);
-                fileElem.value = '';  //clear file input
-                $('#fileSelect').html('Upload');
-
-                //auto insert when paste and drop
-                if((method=='paste')||(method=='drop')) ii(undefined,mdpath,files[0].name);
-              }
-          }
-
-          request.open("POST", "/upload.jssp");
-          request.send(formData);
-        }
-        function postprogress(event)
-        {
-          if (event.lengthComputable)
-          {
-            var percentComplete = event.loaded / event.total;
-            $('#fileSelect').html(' ' + Math.floor(percentComplete*100)+'%');
-          }
-        }
-
-        function ii(obj,mdpath,filename)
-        {
-          var ext = filename.slice(-4);
-          ext = ext.toLowerCase();
-          var pre = "";
-
-          if(['.png','.jpg','.bmp','.gif','jpeg'].indexOf(ext)>=0) pre="!";
-          editor.insert("\n"+pre+"["+filename+"](/a"+mdpath+"/"+filename+")\n");
-        }
-        function ii2(obj,mdpath,filename)
-        {
-          var html = '\n<img src="/a'+mdpath+'/'+filename+'" width="500">\n';
-          editor.insert(html);
-        }
-        function pp(obj,mdpath,filename)
-        {
-          var formData = new FormData();
-          formData.append("filename",filename);
-          formData.append("mdpath",mdpath);
-
-          var request = new XMLHttpRequest();
-          request.onreadystatechange = function() {
-              if (request.readyState == XMLHttpRequest.DONE) {
-                var html = request.responseText;
-                $('.filelist').html(html);
-              }
-          }
-
-          request.open("POST", "/delete.jssp");
-          request.send(formData);
-        }
-
-        document.onpaste = function (event) {
-          // use event.originalEvent.clipboard for newer chrome versions
-          var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
-          var blob = null;
-          for (var i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf("image") === 0) {
-              blob = items[i].getAsFile();
-            }
-          }
-          if(!blob) return;
-
-          // load image if there is a pasted image
-          var reader = new FileReader();
-          reader.onload = function(event) {
-            var dataurl = event.target.result;
-            //console.log(event.target.result); // data url!
-            uploadpasteimage(dataurl,blob);
-          };
-          reader.readAsDataURL(blob);
-        }
-        function uploadpasteimage(dataurl,blob)
-        {
-          var img = document.createElement('img');
-          img.src= dataurl;
-          img = $(img);
-          img.addClass('pasteimagepreview');
-          img.css('position','absolute');
-          img.css('z-index','100');
-          img.css('width','50%');
-          img.css('background','#fff');
-          $('body').prepend(img);
-
-          setTimeout(function()
-          {
-            var w = img.get(0).naturalWidth;
-            var h = img.get(0).naturalHeight;
-            var imagename = prompt("Please enter the image's name! "+w+"x"+h, "");
-            img.remove();
-            if(!imagename) return;
-            if(imagename.indexOf('.')<0) imagename = imagename + '.png';
-            blob.name = imagename;
-            handleFiles([blob],'paste');
-          },0);
-        }
-
-        $('body').on('drop',function (event) {
-          event.preventDefault();
-        });
-        $('body').on('drop',function (event) {
-          var files = event.originalEvent.dataTransfer.files;
-          var result = confirm("Do you really want to upload the file '"+files[0].name+"'?");
-          if(result) handleFiles(files,'drop');
+            $('#preview').dblclick(function()
+            {
+                if(layout.state.center.isClosed) { layout.sizePane('east','50%'); layout.state.center.isClosed = false; }
+                else { layout.sizePane('east','100%'); layout.state.center.isClosed = true; }
+                layout.open('east');
+            })
+            $('#editor').dblclick(function()
+            {
+                if(layout.state.east.isClosed) { layout.sizePane('east','50%'); layout.open('east'); }
+                else { layout.close('east'); }
+            })
         });
       </script>
   </body>

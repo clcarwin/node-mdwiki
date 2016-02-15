@@ -82,7 +82,7 @@
             if(!err) render('loginview',true);
         });
     }
- ?>
+?>
 
 <html>
   <head>
@@ -92,157 +92,8 @@
     <script type="text/javascript" src="/static/md5.js"></script>
     <script type="text/javascript" src="/static/jqueryFileTree.js"></script>
     <link rel="stylesheet" href="/static/jqueryFileTree.css" />
-    <style type="text/css">
-      body {
-        background: #f8f8f8;
-        margin: 0px;
-      }
-      pre {
-          white-space: pre-wrap;
-          background-color: #f8f8f8;
-          border: 1px solid #dfdfdf;
-          margin-top: 1.5em;
-          margin-bottom: 1.5em;
-          padding: 0.125rem 0.3125rem 0.0625rem;
-      }
-
-      .main .markdown-body pre code {
-          background-color: transparent;
-          border: 0;
-          padding: 0;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-      }
-
-      button {
-          width: 80px;
-          height: 25px;
-          margin-top: 4px;
-          margin-bottom: 8px;
-          margin-right: 8px;
-      }
-
-      fieldset {
-          /*width: 300px;*/
-          border: 2px solid #ccc;
-          padding: .5em;
-          margin: auto;
-      }
-
-      .mermaid {
-          opacity: 0;
-      }
-
-      .headerbar {
-        height: 45px;
-      }
-
-      .headermenu {
-        float: right;
-        margin: 20px 40px 10px 40px;
-      }
-      .main {
-          position: absolute;
-          width: 100%;
-          min-height: 600px;
-          top: 45px;
-      }
-      .contentarea {
-          background: #fff;
-          position: relative;
-          width: 100%; 
-          display: flex;
-          float: left;
-      }
-      #sider {
-          min-height: 500px;
-          background: #fff;
-          margin: 0px;
-          flex:1 0 150px;
-          padding: 10px;
-          border-right: 1px solid #aaa;
-      }
-      #show {
-          min-height: 500px;
-          max-width: 100000px;
-          flex:8 1 800px;
-          background: #fff;
-          margin: 10px;
-          padding: 20px;
-          overflow: auto;
-      }
-      .footarea {
-          width: 100%;
-          background: #fff;
-      }
-
-      .filelistmain {
-          width: 100%;
-          display: flex;
-          float: left;
-          background: #fff;
-      }
-      .filelistspace {
-          flex:1 0 150px;
-          padding: 10px;
-          border-right: 1px solid #aaa;
-          background: #fff;
-      }
-      .filelist {
-          max-width: 100000px;
-          flex:8 1 800px;
-          margin: 10px;
-          padding: 20px;
-      }
-
-      .singlefile {
-          width: calc(50% - 30px);
-          height: 21px;
-          background: #ede;
-          margin: 1px 0px 1px 10px;
-          padding: 0px 0px 0px 15px;
-          background-color: #f5f5f5;
-          border: 1px solid #dcdcdc;
-          float: left;
-      }
-      .singlefile a {
-          color: #15c;
-          font-weight: bold;
-          font-size: 13px;
-          font-family: arial,sans-serif;
-
-          display: inline-block;
-          overflow: hidden;
-          padding: 3px 0;
-          text-overflow: ellipsis;
-          vertical-align: bottom;
-          white-space: nowrap;
-          max-width: 315px;
-          text-decoration: none;
-      }
-      .singlefile .sizelabel {
-          color: #777;
-          font-weight: bold;
-          font-size: 13px;
-          font-family: arial,sans-serif;
-          display: inline-block;
-          padding: 3px 0;
-      }
-      .singlefile .insert {
-          display: none;
-      }
-      .singlefile .closefile {
-          display: none;
-      }
-
-      .searchtext {
-          background-color: #ffff99;
-      }
-
-      #admindiv {
-          min-width: 400px;
-      }
-    </style>
+    <link rel="stylesheet" href="/static/mdwiki.css"/>
+    <script type="text/javascript" src="/static/mdwiki.js"></script>
   </head>
   <body>
       <div class="headerbar">
@@ -252,21 +103,19 @@
           {{userhtml}}
         </div>
       </div>
-      <div class="main">     
+      <div class="showmain">     
 
-        <div class="contentarea">
-            <div id="sider" class="sider"></div>
-            <div id="show" class="show markdown-body">{{mdhtml}}</div>
+        <div class="showarea">
+            <div id="showsiderbar" class="showsiderbar"></div>
+            <div id="show" class="show markdown-body">
+                {{mdhtml}}
+                <div class="showfilelist">
+                    <? if((SESSION.username)||(!T.loginview)) include('attachmentlist.jssp'); ?>
+                </div>
+            </div>
+
             <textarea id="textdata" data-path="{{mdpath}}" style="display: none;"></textarea>
         </div>
-        <div class="footarea">
-          <div class="filelistmain">
-            <div class="filelistspace"></div>
-            <div class="filelist">
-              <? if((SESSION.username)||(!T.loginview)) include('attachmentlist.jssp'); ?>
-            </div>
-          </div>
-        </div> 
       </div>
 
       <script type="text/javascript">
@@ -281,14 +130,13 @@
               });
             }
 
-            $('#sider').fileTree({
+            $('#showsiderbar').fileTree({
                 root: '/',
                 script: '/tree.jssp',
                 expandSpeed: 100,
                 collapseSpeed: 100,
                 multiFolder: true
             },function(file) {
-                // alert(file);
                 window.location.href = ''+file;
             },function(dir,parent)
             {
@@ -299,144 +147,6 @@
               });
             });
         });
-
-        function search_text()
-        {
-          var searchtext = prompt("Please enter the search text!", "");
-          if(!searchtext) return;
-          searchtext = searchtext.trim();
-          if(searchtext.length<3){ alert("The search text too short!"); return; }
-
-          var formData = new FormData();
-          formData.append("search",searchtext);
-          formData.append("mdpath",mdpath);
-
-          var request = new XMLHttpRequest();
-          request.onreadystatechange = function() {
-              if (request.readyState == XMLHttpRequest.DONE) {
-                var html = request.responseText;
-                $('#show').html(html);
-              }
-          }
-
-          request.open("POST", "/search.jssp");
-          request.send(formData);
-        }
-
-        function login()
-        {
-            var html = '<div id="logindiv" style="position: fixed; top:0; left:0; width:100%; height:100%; z-index:100;'+
-              'background:rgba(255,255, 255, 0.9);">' +
-              '<div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); padding:.5em; background:white"><fieldset>' +
-              '<legend>Login</legend>' +
-              '<span>Username: </span><input type="text" style="float:right" value="root"><br>' +
-              '<span>Password: </span><input type="password"style="float:right"><br>' +
-              '<button onclick="loginc()">Cancel</button>  <button onclick="logins()">Login</button>' +
-              '</fieldset></div></div>';
-            var div = $(html);
-            $('body').prepend(div);
-        }
-        function loginc()
-        {
-            $('#logindiv').remove();
-        }
-        function logins()
-        {
-            var name = $('#logindiv input')[0].value;
-            if(!name) { $($('#logindiv input')[0]).css("background","red"); return; }
-
-            var password = $('#logindiv input')[1].value;
-            password = md5('_mdwiki_'+password+'_mdwiki_');
-
-            $.get( "/user.jssp?op=login&name="+name+"&password="+password, function(data)
-            {
-                if('loginerror'==data)
-                {
-                    $('#logindiv input').css("background","red");
-                    $('#logindiv legend').html('Username or Password Error')
-                }else
-                if('needsetpassword'==data)
-                {
-                    password = prompt("The "+name+"'s password is empty, please enter the new password!","");
-                    if(!password) { logout('silent'); return; }
-                    password = md5('_mdwiki_'+password+'_mdwiki_');
-                    changepassword(name,password,function(data)
-                    {
-                        location.reload();
-                    });
-                }else
-                if('ok'==data) { location.reload() }
-                else alert('Unknown Error: '+data);
-            });
-        }
-        function logout(silent)
-        {
-            if(!silent) var ret = confirm("Do you really want to logout?");
-            if(!silent) if(!ret) return;
-            $.get( "/user.jssp?op=logout", function(data)
-            {
-                location.reload();
-            });
-        }
-        function changepassword(name,password,cb)
-        {
-            $.get( "/user.jssp?op=add&name="+name+"&password="+password, function(data)
-            {
-                if(cb) cb(data);
-            });
-        }
-
-        function admin()
-        {
-            var html = '<div id="admindiv" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:100;'+
-              'background:rgba(255,255,255,0.9);">' +
-              '<div style="position:fixed; top:20%; left:50%; transform:translate(-50%,-50%); padding:.5em; background:white">' +
-              'user: <span></span><br>' +
-              'mode: <span>everyone, loginedit, loginview</span><br><br>' +
-              '<button onclick="adduser()">Add User</button>  <button onclick="deluser()">Delete User</button>  ' +
-              '<button onclick="wikimode()">Wiki Mode</button><br>' +
-              '<button onclick="logout()">Logout</button>' +
-              '</div></div>';
-            var div = $(html);
-            $('body').prepend(div);
-            $.get( "/user.jssp?op=list", function(data){ $($('#admindiv span')[0]).html(data) });
-        }
-        function adduser()
-        {
-            var name = prompt("Please enter the new username!","");
-            if(!name) { location.reload(); return; }
-            var reg = /^[a-zA-Z0-9]+$/;
-            if(!name.match(reg)) { alert('Only a-z A-Z 0-9 can be used for name!'); location.reload(); return; }
-            changepassword(name,'',function(data)
-            {
-                if('ok'==data) alert('Add user successful!');
-                else alert('Add user error: '+data);
-                location.reload();
-            });
-        }
-        function deluser()
-        {
-            var name = prompt("Please enter the username will be deleted!","");
-            if(!name) { location.reload(); return; }
-            $.get( "/user.jssp?op=delete&name="+name, function(data)
-            {
-                if('ok'==data) alert('Delete user successful!');
-                else if('lastusererror'==data) alert('Last user can not be deleted!');
-                else alert('Delete user error: '+data);
-                location.reload();
-            });
-        }
-        function wikimode()
-        {
-            var mode = prompt("Please enter the new wikimode!","");
-            if(!mode) { location.reload(); return; }
-            $.get( "/user.jssp?op=setmode&mode="+mode, function(data)
-            {
-                if('ok'==data) alert('Set new mode successful!');
-                else alert('Set new mode error: '+data);
-                location.reload();
-            });
-        }
       </script>
   </body>
 </html>
