@@ -44,7 +44,7 @@
 	{
 		configobj.user[name] = password;
 		config = JSON.stringify(configobj);
-		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(EXT.wikiroot + '/wikiconfig', config, 'utf8');
 
 		GLOBAL.usercount = 0;
 	    for(var key in configobj.user) GLOBAL.usercount++;
@@ -69,7 +69,7 @@
 			if(name==SESSION.username) delete SESSION.username;
 
 			config = JSON.stringify(configobj);
-			fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+			fs.writeFile(EXT.wikiroot + '/wikiconfig', config, 'utf8');
 
 			GLOBAL.usercount = 0;
 		    for(var key in configobj.user) GLOBAL.usercount++;
@@ -96,7 +96,7 @@
 		GLOBAL.wikimode = configobj.wikimode;
 
 		config = JSON.stringify(configobj);
-		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(EXT.wikiroot + '/wikiconfig', config, 'utf8');
 		echo('ok');
 	}
 	else
@@ -108,7 +108,7 @@
 		GLOBAL.wikiname = configobj.wikiname;
 
 		config = JSON.stringify(configobj);
-		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(EXT.wikiroot + '/wikiconfig', config, 'utf8');
 		echo('ok');
 	}
 

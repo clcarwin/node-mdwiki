@@ -8,7 +8,7 @@
 
 	var spawn = require('child_process').spawn;
 
-	var args = ["czf", "-", "-C", __dirname, "wikiconfig", "wiki"];
+	var args = ["czf", "-", "-C", EXT.wikiroot, "wikiconfig", "wiki"];
 	var tar = spawn('tar',args);
 	tar.stdout.on('data',function(data)
 	{

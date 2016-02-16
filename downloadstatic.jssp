@@ -4,7 +4,7 @@
 
 	var filename = POST['filename'];
 	filename = path.normalize(filename);
-	var filefullname = __dirname + filename;
+	var filefullname = EXT.wikiroot + filename;
 	fs.readFile(filefullname,function(err,data)
 	{
 		if(err)

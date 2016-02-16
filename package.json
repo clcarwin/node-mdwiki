@@ -1,0 +1,21 @@
+{
+  "name": "node-mdwiki",
+  "version": "0.1.0",
+  "description": "The mdwiki is a wiki system base on markdown syntax. All documents and attachments are stored in the filesystem.",
+  "main": "mdwiki.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clcarwin/node-mdwiki"
+  },
+  "keywords": [
+    "wiki",
+    "markdown",
+    "jssp",
+    "file"
+  ],
+  "dependencies": {
+    "jssp": ">1.1.1"
+  },
+  "author": "carwin",
+  "license": "MIT"
+}

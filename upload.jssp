@@ -33,7 +33,7 @@
 		try{ fs.rmdirSync(dirPath) }catch(e){}
     };
 
-	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
+	var mddir    = EXT.wikiroot + '/wiki/' + mdpath + '.md.list';
 	var filepath = mddir + '/' + filename;
 	mkdir(mddir);	//the dir may not exist
 	fs.writeFileSync(filepath,buffer);

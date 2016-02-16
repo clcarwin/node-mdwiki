@@ -9,7 +9,7 @@
 	filename = filename.slice(2);
 	filename = path.normalize(filename);
 
-	var filefullpath = __dirname + '/wiki/' + filename;
+	var filefullpath = EXT.wikiroot + '/wiki/' + filename;
 	var filedir  = path.dirname(filefullpath);
 	var name = path.basename(filefullpath);
 	var filemdpath = filedir+'.md';

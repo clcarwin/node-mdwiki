@@ -4,11 +4,10 @@
 
 	var fs = require('fs');
 	var rootdir = POST['dir'];
-	var files = fs.readdirSync(__dirname+'/wiki/'+rootdir);
 	var mdlist = [];
 	var dirlist = [];
 
-	var dir = __dirname+'/wiki/'+rootdir;
+	var dir = EXT.wikiroot+'/wiki/'+rootdir;
 	fs.readdir(dir,function(err,files)
 	{
 		if(err) return exit('ERROR');

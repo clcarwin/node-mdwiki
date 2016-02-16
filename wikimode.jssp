@@ -2,8 +2,9 @@
 	var fs = require('fs');
 	session_start();
 
+	if(!EXT.wikiroot) EXT.wikiroot = __dirname;
 	var configobj = {};
-	fs.readFile(__dirname + '/wikiconfig', 'utf8',function(err, data)
+	fs.readFile(EXT.wikiroot + '/wikiconfig', 'utf8',function(err, data)
 	{
 		if(err) read_config_error();
 		else
@@ -34,5 +35,5 @@
 		configobj.user['root'] = '';
 
 		var config = JSON.stringify(configobj);
-		fs.writeFile(__dirname + '/wikiconfig', config, 'utf8');
+		fs.writeFile(EXT.wikiroot + '/wikiconfig', config, 'utf8');
 	}

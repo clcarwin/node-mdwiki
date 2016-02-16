@@ -6,8 +6,8 @@
     /*jssp code run on server*/
     var fs = require('fs');
     var mdpath   = POST['mdpath'];
-    var path  = __dirname + '/wiki/' + mdpath + '.md.html';
-    var mddir = __dirname + '/wiki/' + mdpath + '.md.list';
+    var path  = EXT.wikiroot + '/wiki/' + mdpath + '.md.html';
+    var mddir = EXT.wikiroot + '/wiki/' + mdpath + '.md.list';
 
     render('mdpath',mdpath);
     render('mdexist',true);
@@ -69,7 +69,7 @@
 
     var fs = require('fs');
     var mdpath   = POST['mdpath'];
-    var lvpath  = __dirname + '/wiki/' + mdpath + '.md.lv';
+    var lvpath  = EXT.wikiroot + '/wiki/' + mdpath + '.md.lv';
 
     fs.stat(lvpath,function(err,stats)
     {

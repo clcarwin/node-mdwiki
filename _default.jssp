@@ -8,6 +8,8 @@
 	var urlobj = url.parse(POST['REQUEST']);
 	var filename = urlobj.pathname;
 
+	if(!EXT.wikiroot) EXT.wikiroot = __dirname;
+
 	if(filename.indexOf('/a/')==0)
 	{
 		POST['filename'] = filename;

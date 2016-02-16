@@ -6,10 +6,10 @@
 	var path = require('path');
 	var filename = POST['mdpath'];
 
-	var textfile = __dirname + '/wiki/' + filename + '.md';
-	var htmlfile = __dirname + '/wiki/' + filename + '.md.html';
-	var lvfile   = __dirname + '/wiki/' + filename + '.md.lv';
-	var mddir    = __dirname + '/wiki/' + filename + '.md.list';
+	var textfile = EXT.wikiroot + '/wiki/' + filename + '.md';
+	var htmlfile = EXT.wikiroot + '/wiki/' + filename + '.md.html';
+	var lvfile   = EXT.wikiroot + '/wiki/' + filename + '.md.lv';
+	var mddir    = EXT.wikiroot + '/wiki/' + filename + '.md.list';
 	var mdtext   = POST['mdtext'];
 	var mdhtml   = POST['mdhtml'];
 	var loginview= POST['loginview'];
@@ -56,7 +56,7 @@
 		try{ fs.unlinkSync(lvfile)   }catch(e){}
 		rm_dir(mddir);
 
-		var basedir = __dirname + '/wiki/';
+		var basedir = EXT.wikiroot + '/wiki/';
 		basedir = path.normalize(basedir);
 
 		var workdir = mddir;

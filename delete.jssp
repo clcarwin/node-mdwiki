@@ -8,7 +8,7 @@
 	var filename = POST['filename'];
 	for(filename in FILE) {}
 
-	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
+	var mddir    = EXT.wikiroot + '/wiki/' + mdpath + '.md.list';
 	var filepath = mddir + '/' + filename;
 	fs.unlinkSync(filepath);
 

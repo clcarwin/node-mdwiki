@@ -5,7 +5,7 @@
 	var path = require('path');
 
 	var mdpath = POST['mdpath'];
-	var mddir    = __dirname + '/wiki/' + mdpath + '.md.list';
+	var mddir    = EXT.wikiroot + '/wiki/' + mdpath + '.md.list';
 
 	render('sl',[]);
 	render('mdpath',mdpath);

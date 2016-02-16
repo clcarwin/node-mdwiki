@@ -5,7 +5,7 @@
     var querystring = require('querystring');
 
     var mdpath   = POST['mdpath'];
-    var path = __dirname + '/wiki/' + mdpath + '.md';
+    var path = EXT.wikiroot + '/wiki/' + mdpath + '.md';
     var lvpath = path + '.lv';
 
     render('mdpath',mdpath);

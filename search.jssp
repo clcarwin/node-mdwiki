@@ -15,7 +15,7 @@
 	}
 
 	//grep -r --include \*.md -C 3 "TD" .
-	var args = ["-r", "--include", "*.md","-i", search, __dirname + "/wiki"];
+	var args = ["-r", "--include", "*.md","-i", search, EXT.wikiroot + "/wiki"];
 	var grep = spawn('grep',args);
 
 	var str = "";
@@ -44,7 +44,7 @@
 			var mdpath = body.slice(0,index+4-1);
 			body = body.replace(new RegExp(mdpath+':', 'g'), "");
 			body = body.replace(new RegExp('<', 'g'), "&lt;");
-			mdpath = mdpath.replace(new RegExp(__dirname+'/wiki', 'g'), "");
+			mdpath = mdpath.replace(new RegExp(EXT.wikiroot+'/wiki', 'g'), "");
 			
 			pathlist.push(mdpath);
 			bodylist.push(body);
