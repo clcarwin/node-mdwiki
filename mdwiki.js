@@ -14,7 +14,21 @@ function mdwiki()
 		server.listen(port,host);
 		server.setopt({"BASE":base});
 		server.setext('wikiroot',wikipath);
+
+		mkdir(wikipath+'/wiki');
 	}
+}
+
+function mkdir(path, root)
+{
+    var dirs = path.split('/'), dir = dirs.shift(), root = (root || '') + dir + '/';
+    try
+    {	var stat = undefined;
+    	try{ stat = fs.statSync(root) }catch(e){}
+    	if(!stat) fs.mkdirSync(root);
+    }catch (e){}
+
+    return !dirs.length || mkdir(dirs.join('/'), root);
 }
 
 if(require.main === module)
@@ -31,4 +45,6 @@ if(require.main === module)
 
 	var mod = module.exports;
 	var wiki = mod.CreateWiki(port,host,wikipath);
+	mkdir(wikipath+'/wiki');
 }
+
