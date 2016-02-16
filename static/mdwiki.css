@@ -43,6 +43,10 @@ pre {
     background-color: #ccc;
 }
 
+.markdown-body h1 {
+    border-bottom: 1px solid #bbb;
+}
+
 
 .showarea .mermaid {
     opacity: 0;
@@ -180,7 +184,7 @@ pre {
     margin: 0px;
     flex:1 0 150px;
     padding: 10px;
-    border-right: 1px solid #aaa;
+    border-right: 1px solid #bbb;
 }
 #show {
     min-height: 500px;
@@ -198,7 +202,7 @@ pre {
 .showfilelist {
     margin: 40px 0 0 0;
     padding: 10px 0 0 0;
-    border-top: 1px dashed;
+    border-top: 1px dashed #bbb;
     display: none;
 }
 .showfilelist .insert {
@@ -216,7 +220,37 @@ pre {
     min-width: 400px;
 }
 
+.hedit {
+    width: initial;
+    height: initial;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    vertical-align: text-bottom;
+    float: right;
+    margin: 0;
+    opacity: 0.5;
+}
+.hedithover {
+    background: #ffffee;
+    background-color: #ffffee;
+}
 
+.wikitoc {
+    margin-top: 40px;
+}
+.wikitoc .H1 {
+    font-size: 10px;
+    margin: 0;
+    text-decoration: none;
+    color: #888;
+}
+.wikitoc .H2 {
+    padding-left: 10px;
+    font-size: 10px;
+    margin: 0;
+    text-decoration: none;
+    color: #888;
+}
 
 
 

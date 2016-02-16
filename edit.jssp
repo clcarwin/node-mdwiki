@@ -27,6 +27,9 @@
         if(err) render('loginviewchecked','');
         else render('loginviewchecked','checked');
     });
+
+    var editline = GET['l'];
+    render('editline',editline);
 ?>
 <?
     session_start();
@@ -84,10 +87,13 @@
       </div>
       <script type="text/javascript">
         {{donotedit}}
+        var editline  = "{{editline}}";
+        var beginline = undefined;
+        var endline   = undefined;
+        var edittext  = document.getElementById("textdata").value;
 
         $(function(){
-            var text = document.getElementById("textdata").value;
-            editor.session.setValue(text);
+            editor.session.setValue(lineedit(edittext,editline));
 
             $.post( "/attachmentlist.jssp",{"mdpath":"{{mdpath}}"}, function(data){ $( ".filelist" ).html(data) });
 

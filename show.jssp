@@ -61,6 +61,7 @@
     var label = T.mdexist?'Edit':'Create';
     var edithtml = '<a href="'+T.mdpath+'?p=edit">' + label + '</a>';
     render('edithtml',SESSION.editable?edithtml:'');
+    render('editable',SESSION.editable?'true':'false');
 
     var searchhtml = '<a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>';
     render('searchhtml',SESSION.editable?searchhtml:'');
@@ -111,7 +112,10 @@
       <div class="showmain">     
 
         <div class="showarea">
-            <div id="showsiderbar" class="showsiderbar"></div>
+            <div id="showsiderbar" class="showsiderbar">
+                <div id="jstree"></div>
+                <div class="wikitoc"></div>
+            </div>
             <div id="show" class="show markdown-body" {{loginviewcolor}}>
                 {{mdhtml}}
                 <div class="showfilelist">
@@ -127,6 +131,7 @@
         var mdpath = $('#textdata').attr('data-path');
         var mdpathlong = mdpath;
         var userdefault = "{{userdefault}}";
+        var editable = {{editable}};
 
         $(function () {
             if( $('.mermaid').size()>0 ) {
@@ -136,7 +141,7 @@
               });
             }
 
-            $('#showsiderbar').fileTree({
+            $('#jstree').fileTree({
                 root: '/',
                 script: '/tree.jssp',
                 expandSpeed: 100,
@@ -154,6 +159,15 @@
             });
 
             if(0!=$('.singlefile').length) $('.showfilelist').show();
+
+            //add edit button
+            if(editable) {
+                $('h1').append('<button class="hedit">Edit</button>');
+                $('h2').append('<button class="hedit">Edit</button>');
+                $('.hedit').hover(hedithoverin,hedithoverout);
+                $('.hedit').click(heditclick);
+            }
+
         });
       </script>
   </body>

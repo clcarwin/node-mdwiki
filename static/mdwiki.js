@@ -169,7 +169,7 @@ function backup()
 //edit
 function postfile()
 {
-  var mdtext = editor.session.getValue();
+  var mdtext = linesave(editor.session.getValue());
   var mdhtml = mdc.render(mdtext);
   var mdpath = $('#textdata').attr('data-path');
   var lovinview = $('#loginviewcheck')[0].checked;
@@ -307,6 +307,95 @@ function uploadpasteimage(dataurl,blob)
     handleFiles([blob],'paste');
   },0);
 }
+
+
+//edit
+var beginline,endline;
+function hedithoverin(e)
+{
+    var h = $(this).parent();
+    var tag = h[0].tagName;
+
+    var n = h;
+    beginline = n.attr('data-source-line');
+    while(true)
+    {
+        n.addClass('hedithover');
+        endline = n.attr('data-source-line');
+        n = n.next();
+        var ntag = n[0].tagName;
+        if((ntag[0]=='H')&&(ntag<=tag)) break;
+        if(!n.attr('data-source-line')) break;
+    }
+    var line = n.attr('data-source-line');
+    if(line!=undefined) endline = (parseInt(line)-1)+'';
+}
+function hedithoverout(e)
+{
+    $('.hedithover').removeClass('hedithover');
+}
+function heditclick(e)
+{
+    window.location.href = ''+mdpath+'?p=edit&l='+beginline+'-'+endline;
+}
+
+function lineedit(text,editline)
+{
+    if(editline.length==0) return text;
+
+    editline = editline.split('-');
+    try {
+        beginline = parseInt(editline[0]);
+        endline = parseInt(editline[1]);
+    }catch(e){ return text }
+    beginline--; endline--;
+    if((beginline<0)||(endline<0)||(beginline>endline)) return text;
+
+    var textlist = text.split('\n');
+    if(endline>=textlist.length) return text;
+
+    textlist = textlist.slice(beginline,endline+1);
+    return textlist.join('\n');
+}
+
+function linesave(savetext)
+{
+    if( (undefined==beginline)||(undefined==endline) ) return savetext;
+    var textlist = edittext.split('\n');
+    var head = textlist.slice(0,beginline);
+    var tail = textlist.slice(endline+1);
+
+    if(''==savetext) savetext = [];
+    else savetext = [savetext];
+    textlist = [];
+    Array.prototype.push.apply(textlist,head);
+    Array.prototype.push.apply(textlist,savetext);
+    Array.prototype.push.apply(textlist,tail);
+    return textlist.join('\n');
+}
+
+function initwikitoc()
+{
+    var n = $('.markdown-body :first-child');
+    while(true)
+    {
+        var tag  = n[0].tagName;
+        if( (tag=='H1')||(tag=='H2') )
+        {
+            var href = n.find('a').attr('href');
+            var text = n.clone().children().remove().end().html();
+            text = text.trim();
+            
+            var html = '<div><a class='+tag+' href="'+href+'">'+text+'</a></div>';
+            if(text) $('.wikitoc').append(html);
+        }
+
+        n = n.next();
+        if(!n.length) break;
+    }
+}
+
+
 
 
 
