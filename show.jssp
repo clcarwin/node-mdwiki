@@ -134,12 +134,6 @@
         var editable = {{editable}};
 
         $(function () {
-            if( $('.mermaid').size()>0 ) {
-              $.getScript( "/static/mermaid.min.js",function(){
-                mermaid.init();
-                $('.mermaid').fadeTo(1000,1);
-              });
-            }
 
             $('#jstree').fileTree({
                 root: '/',
