@@ -121,7 +121,9 @@
                 if(layout.state.center.isClosed) { layout.sizePane('east','50%'); layout.state.center.isClosed = false; }
                 else { layout.sizePane('east','100%'); layout.state.center.isClosed = true; }
                 layout.open('east');
-            })
+            });
+            mermaid.ganttConfig.axisFormatter[0][0] = "%m-%d";
+
         });
       </script>
   </body>
