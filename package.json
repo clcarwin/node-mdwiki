@@ -1,7 +1,7 @@
 {
   "name": "node-mdwiki",
-  "version": "0.2.0",
-  "description": "The mdwiki is a wiki system base on markdown syntax. All documents and attachments are stored in the filesystem.",
+  "version": "0.2.2",
+  "description": "The mdwiki is a wiki system base on markdown files.",
   "main": "mdwiki.js",
   "repository": {
     "type": "git",
