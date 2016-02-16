@@ -1,9 +1,28 @@
 <?
+    session_start();
+    if(!SESSION.viewable) return exit();
+
 	var fs = require('fs');
 	var rootdir = POST['dir'];
 	var files = fs.readdirSync(__dirname+'/wiki/'+rootdir);
 	var mdlist = [];
 	var dirlist = [];
+
+	var dir = __dirname+'/wiki/'+rootdir;
+	fs.readdir(dir,function(err,files)
+	{
+		if(err) return exit('ERROR');
+
+		files.forEach(function(name)
+		{
+			var path = dir + '/' + name;
+			fs.stat(path,function(err,stat)
+			{
+				if(err) return exit('ERROR');
+				searchmdfile(files,stat,name,path);
+			});
+		});
+	});
 
 	function rm_dir(dirPath)
 	{
@@ -18,29 +37,56 @@
 		try{ fs.rmdirSync(dirPath) }catch(e){}
     };
 
-	files.forEach(function(name)
-	{
-		var path = __dirname+'/wiki/'+rootdir + '/' + name;
-		var stat = fs.statSync(path);
-		if(stat.isDirectory()&&(name.indexOf('.')<0)) dirlist.push(name);
-		if(stat.isFile()&&(name.slice(-3)=='.md'))
-		{
-			if(name!='index.md') mdlist.push(name.slice(0,name.length-3));
-		}
-
-		if(stat.isDirectory()&&(name.slice(-5)=='.list'))
-		{
-			//remove xxxx.md.list dir, if xxxx.md file not exists
-			var mdname = name.slice(0,name.length-5);
-			if(files.indexOf(mdname)<0) rm_dir(path); 
-		}
-		if(stat.isFile()&&(name.slice(-5)=='.html'))
-		{
-			//remove xxxx.md.html file, if xxxx.md file not exists
-			var mdname = name.slice(0,name.length-5);
-			if(files.indexOf(mdname)<0) fs.unlinkSync(path); 
-		}
-	});
+    function searchmdfile(files,stat,name,path)
+    {
+    	if(stat.isDirectory())
+    	{
+    		var ext = name.slice(-5);
+    		var ext2 = name.slice(-8).slice(0,3);
+    		var mdname = name.slice(0, name.length - 5);
+    		if(('.list'==ext)&&('.md'==ext2))
+    		{
+    			//this is md dir xxx.md.list; remove xxxx.md.list, if xxxx.md not exists
+    			if(files.indexOf(mdname)<0) rm_dir(path);
+    		}
+    		else
+    		{
+    			//this is a normal dir
+    			dirlist.push(name);
+    		}
+    	}
+    	else
+    	if(stat.isFile())
+    	{
+    		var ext = name.slice(-3);
+    		var ext2 = name.slice(-5);
+    		var ext3 = name.slice(-6).slice(0,3);
+    		if('.md'==ext)
+    		{
+    			var showname = name.slice(0, name.length - 3);
+    			if(name=='index.md') {}  //not show index
+                else
+                {
+                    if((!SESSION.username)&&(SESSION.viewable)&&(files.indexOf(name+'.lv')>=0)) {}
+                    else mdlist.push(showname);
+                }
+    		}
+    		else
+    		if(('.lv'==ext)&&('.md'==ext3))
+    		{
+    			//remove xxxx.md.lv file, if xxxx.md file not exists
+    			var mdname = name.slice(0, name.length - 3);
+    			if(files.indexOf(mdname)<0) fs.unlinkSync(path); 
+    		}
+    		else
+    		if('.html'==ext2)
+    		{
+    			//remove xxxx.md.html file, if xxxx.md file not exists
+    			var mdname = name.slice(0, name.length - 5);
+    			if(files.indexOf(mdname)<0) fs.unlinkSync(path); 
+    		}
+    	}
+    }
 
 	render('mdlist',mdlist);
 	render('dirlist',dirlist);

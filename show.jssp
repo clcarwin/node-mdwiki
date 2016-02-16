@@ -65,20 +65,24 @@
     var searchhtml = '<a href="javascript:var a=function(){return false;}" onclick="search_text()">Search</a>';
     render('searchhtml',SESSION.editable?searchhtml:'');
 
-    if((!SESSION.username)&&(SESSION.viewable))
-    {
-        var fs = require('fs');
-        var mdpath   = POST['mdpath'];
-        var lvpath  = __dirname + '/wiki/' + mdpath + '.md.lv';
 
-        fs.stat(lvpath,function(err,stats)
+    var fs = require('fs');
+    var mdpath   = POST['mdpath'];
+    var lvpath  = __dirname + '/wiki/' + mdpath + '.md.lv';
+
+    fs.stat(lvpath,function(err,stats)
+    {
+        if((!SESSION.username)&&(SESSION.viewable))
         {
             var html = "<h1>This topic can not be viewed</h1>" +
             "<p>You need to login to view this document. An access permission has been set.</p>";
             if(!err) render('mdhtml',html);
             if(!err) render('loginview',true);
-        });
-    }
+        }
+
+        render('loginviewcolor','');
+        if(SESSION.username) if(!err) render('loginviewcolor','style="border-top: 1px solid skyblue"');
+    });
 
     render('userdefault',GLOBAL.userdefault);
     render('title',GLOBAL.wikiname?'<title>'+GLOBAL.wikiname+'</title>':'');
@@ -108,7 +112,7 @@
 
         <div class="showarea">
             <div id="showsiderbar" class="showsiderbar"></div>
-            <div id="show" class="show markdown-body">
+            <div id="show" class="show markdown-body" {{loginviewcolor}}>
                 {{mdhtml}}
                 <div class="showfilelist">
                     <? if((SESSION.username)||(!T.loginview)) include('attachmentlist.jssp'); ?>
