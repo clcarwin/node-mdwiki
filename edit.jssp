@@ -124,6 +124,7 @@
             });
             mermaid.ganttConfig.axisFormatter[0][0] = "%m-%d";
 
+            setInterval(function(){ keep(true) },300*1000);
         });
       </script>
   </body>

@@ -169,30 +169,31 @@ function backup()
 //edit
 function postfile()
 {
-  setTimeout(function()
-  {
     var mdtext = linesave(editor.session.getValue());
-    var mdhtml = $('#preview').html();  //mdc.render(mdtext);
-    var mdpath = $('#textdata').attr('data-path');
-    var lovinview = $('#loginviewcheck')[0].checked;
+    mdc.init(mdtext, false);  //realtime preview
+    setTimeout(function()
+    {
+        var mdhtml = $('#preview').html();  //mdc.render(mdtext);
+        var mdpath = $('#textdata').attr('data-path');
+        var lovinview = $('#loginviewcheck')[0].checked;
 
-    var formData = new FormData();
-    formData.append("mdtext",mdtext);
-    formData.append("mdhtml",mdhtml);
-    formData.append("mdpath",mdpath);
-    if(lovinview) formData.append("loginview","true");
+        var formData = new FormData();
+        formData.append("mdtext",mdtext);
+        formData.append("mdhtml",mdhtml);
+        formData.append("mdpath",mdpath);
+        if(lovinview) formData.append("loginview","true");
 
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (request.readyState == XMLHttpRequest.DONE) {
-            if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
-            window.location.href = mdpath;
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function() {
+            if (request.readyState == XMLHttpRequest.DONE) {
+                if('ok'!=request.responseText) alert('Save Error: '+request.responseText);
+                window.location.href = mdpath;
+            }
         }
-    }
 
-    request.open("POST", "/postmd.jssp");
-    request.send(formData);
-  },100);
+        request.open("POST", "/postmd.jssp");
+        request.send(formData);
+    },0);
 }
 
 function cancelfile()
@@ -398,7 +399,14 @@ function initwikitoc()
     }
 }
 
-
+function keep(needalert)
+{
+    $.get( "/keep.jssp", function(data)
+    {
+        if('ok'==data) return;
+        if(needalert) alert("SESSION keep failed, please save your data out of the brower!");
+    });
+}
 
 
 

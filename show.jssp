@@ -162,6 +162,7 @@
                 $('.hedit').click(heditclick);
             }
 
+            setInterval(function(){ keep() },300*1000);
         });
       </script>
   </body>
