@@ -333,6 +333,7 @@ function hedithoverin(e)
     }
     var line = n.attr('data-source-line');
     if(line!=undefined) endline = (parseInt(line)-1)+'';
+    else endline = 'end';
 }
 function hedithoverout(e)
 {
@@ -350,7 +351,8 @@ function lineedit(text,editline)
     editline = editline.split('-');
     try {
         beginline = parseInt(editline[0]);
-        endline = parseInt(editline[1]);
+        if('end'==editline[1]) endline = (text.match(/\n/g) || []).length + 1;
+        else endline = parseInt(editline[1]);
     }catch(e){ return text }
     beginline--; endline--;
     if((beginline<0)||(endline<0)||(beginline>endline)) return text;
