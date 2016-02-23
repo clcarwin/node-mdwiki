@@ -62,7 +62,7 @@ pre {
 .showmain {
     position: absolute;
     width: 100%;
-    height: calc(100% - 90px);
+    height: calc(100% - 45px);
     top: 45px;
 }
 .editmain {
@@ -171,11 +171,11 @@ pre {
     background: #fff;
     position: relative;
     width: 100%; 
+    min-height: 100%;
     display: flex;
     float: left;
 }
 #showsiderbar {
-    min-height: 500px;
     background: #fff;
     margin: 0px;
     flex:1 0 150px;
@@ -183,7 +183,6 @@ pre {
     border-right: 1px solid #bbb;
 }
 #show {
-    min-height: 500px;
     max-width: 100000px;
     flex:8 1 800px;
     background: #fff;

@@ -93,6 +93,7 @@
   <head>
     {{title}}
     <meta charset="utf-8">
+    <link href="/static/fav.png" rel="shortcut icon">
     <link rel="stylesheet" href="/static/markdown-plus.min.css"/>
     <script type="text/javascript" src="/static/jquery-1.12.0.min.js"></script>
     <script type="text/javascript" src="/static/md5.js"></script>
