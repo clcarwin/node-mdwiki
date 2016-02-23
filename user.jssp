@@ -18,12 +18,14 @@
 		var truepassword = configobj.user[name];
 		if(truepassword=='')
 		{
+			session_save();
 			SESSION.username = name;
 			echo('needsetpassword');
 		}
 		else
 		if(truepassword==password)
 		{
+			session_save();
 			SESSION.username = name;
 			echo('ok');
 		}

@@ -1,6 +1,5 @@
 <?
 	var fs = require('fs');
-	session_start();
 
 	if(!EXT.wikiroot) EXT.wikiroot = __dirname;
 	var configobj = {};
@@ -15,11 +14,6 @@
 		GLOBAL.wikimode   = configobj.wikimode;
 		GLOBAL.wikiname   = configobj.wikiname;
 		GLOBAL.configobj  = configobj;
-
-		if( (GLOBAL.wikimode=='loginview')&&(!SESSION.username) ) SESSION.viewable = false;
-	    else SESSION.viewable = true;
-	    if( (GLOBAL.wikimode=='everyone')||(SESSION.username) ) SESSION.editable = true;
-	    else SESSION.editable = false;
 
 	    GLOBAL.usercount = 0;
 	    for(var key in configobj.user) GLOBAL.usercount++;
