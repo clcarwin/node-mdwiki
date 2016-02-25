@@ -12,5 +12,11 @@
 			echo('<h1>404 Not Found</h1>');
 			echo('<p>'+SERVER['HTTP_HOST']+'/'+filename+'</p>');
 		}
-		else echo(data);
+		else
+		{
+			//30days (60sec * 60min * 24hours * 30days)
+			if(data.length>512*1024) header("Cache-Control","max-age=2592000");
+			
+			echo(data);
+		}
 	});
